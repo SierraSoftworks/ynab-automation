@@ -16,7 +16,7 @@
     "ynab": "^1.32.0"
   },
   "devDependencies": {
-    "@types/node": "16.x",
+    "@types/node": "18.x",
     "typescript": "^4.0.0"
   }
 }
