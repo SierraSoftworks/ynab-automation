@@ -2,9 +2,11 @@ on:
   schedule:
     - cron: 0 0/6 * * *
   workflow_dispatch: {}
+
+name: Run
 jobs:
   run:
-    name: Run (Scheduled)
+    name: Scheduled Update
     runs-on: ubuntu-latest
 
     steps:
