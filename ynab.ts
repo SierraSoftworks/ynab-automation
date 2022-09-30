@@ -5,12 +5,11 @@ import { getStockInformation } from "./stocks"
 
 const api = new ynab.API(process.env.YNAB_API_KEY)
 
-export async function updateAccount(budgetId: string, accountName: string, payeeName: string) {
+export async function updateAccount(budgetId: string, accountId: string, payeeName: string) {
     const budget = await api.budgets.getBudgetById(budgetId || "default")
 
-    const accounts = await api.accounts.getAccounts(budgetId)
-    const account = accounts.data.accounts.find(a => a.name === accountName)
-    if (!account) throw new Error(`Account ${accountName} not found in budget ${budgetId}, available accounts: ${accounts.data.accounts.map(a => a.name).join(", ")}`)
+    const accounts = await api.accounts.getAccountById(budgetId, accountId)
+    const account = accounts.data.account
     
     const payees = await api.payees.getPayees(budgetId)
     let payee = payees.data.payees.find(p => p.name === payeeName)
