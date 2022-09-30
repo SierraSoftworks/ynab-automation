@@ -10,7 +10,7 @@ export async function updateAccount(budgetId: string, accountId: string, payeeNa
 
     const accounts = await api.accounts.getAccountById(budgetId, accountId)
     const account = accounts.data.account
-    
+
     const payees = await api.payees.getPayees(budgetId)
     let payee = payees.data.payees.find(p => p.name === payeeName)
 
@@ -22,11 +22,14 @@ export async function updateAccount(budgetId: string, accountId: string, payeeNa
 
     if (!values.length) return;
 
+    const shift = Math.floor(values.reduce((sum, stock) => sum + stock.value, 0)*1000) - account.balance;
+    if (!shift) return;
+
     await api.transactions.createTransaction(budgetId, {
         transaction: {
             account_id: account.id,
             date: new Date().toISOString().split('T')[0],
-            amount: Math.floor(values.reduce((sum, stock) => sum + stock.value, 0)*1000) - account.balance,
+            amount: shift,
             payee_name: "Stock Adjustment",
             cleared: ynab.SaveTransaction.ClearedEnum.Reconciled,
             approved: true,
