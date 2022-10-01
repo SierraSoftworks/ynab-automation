@@ -29,7 +29,7 @@ export async function updateAccounts(budgetId: string, payeeName: string) {
                 payee_name: payeeName,
                 cleared: ynab.SaveTransaction.ClearedEnum.Cleared,
                 approved: true,
-                memo: values.map(v => `${v.symbol} ${v.nativeValue}`).join(', ')
+                memo: values.map(v => `${v.symbol}: ${v.nativeCurrency} ${v.nativeValue.toFixed(2)}`).join(', ')
             }
         })
     }))
