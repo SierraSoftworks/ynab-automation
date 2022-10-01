@@ -12,6 +12,7 @@ update an Unlinked Account in YNAB with the current value of your stock portfoli
    
    ```
    /automate:stock
+   # Modify your list of stocks here
    MSFT:100
    AAPL:100
    GOOG:100
