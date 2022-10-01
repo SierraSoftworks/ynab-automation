@@ -1,14 +1,13 @@
-import {updateAccount} from "./ynab"
+import {updateAccounts} from "./ynab"
 
-const spec: {
-    budgetId: string
-    accountId: string
-    payeeName: string
-}[] = JSON.parse(process.env.YNAB_IMPORT_SPEC)
+const budgetId = process.env.YNAB_BUDGET_ID
+const payeeName = process.env.YNAB_PAYEE_NAME || "Stock Market"
 
-Promise.all(spec.map(async account => {
-    await updateAccount(account.budgetId, account.accountId, account.payeeName)
-})).then(() => {
+if (!budgetId) {
+    throw new Error("You haven't provided the YNAB_BUDGET_ID environment variable")
+}
+
+updateAccounts(budgetId, payeeName).then(() => {
     console.log("Updated YNAB account with the latest stock information.")
 }).catch(err => {
     console.error(err)
