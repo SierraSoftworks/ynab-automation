@@ -25,5 +25,5 @@ update an Unlinked Account in YNAB with the current value of your stock portfoli
    - `YNAB_API_KEY`: Your YNAB Personal API Token
    - `YNAB_BUDGET_ID`: The ID of your YNAB budget, this is the first GUID in the URL when you are viewing your budget in the YNAB web app.
 
-By default, your stock portfolio will be updated every 6 hours by the `.github/workflows/run.yaml` workflow.
+By default, your stock portfolio will be updated every 12 hours by the `.github/workflows/run.yaml` workflow.
 You can adjust this by modifying the schedule, or force an update by running the action manually.
