@@ -10,5 +10,6 @@ if (!budgetId) {
 updateAccounts(budgetId, payeeName).then(() => {
     console.log("Updated YNAB account with the latest stock information.")
 }).catch(err => {
-    console.error(err)
+    console.error("Failed to update YNAB account with the latest stock information.", err)
+    process.exit(1)
 })
