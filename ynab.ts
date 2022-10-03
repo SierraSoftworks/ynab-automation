@@ -19,7 +19,9 @@ export async function updateAccounts(budgetId: string, payeeName: string) {
         if (!values.length) return;
     
         const shift = Math.floor(values.reduce((sum, stock) => sum + stock.value, 0)*1000) - account.balance;
-        if (shift === 0) return;
+
+        // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
+        if (Math.abs(shift) <= 1000) return;
     
         await api.transactions.createTransaction(budgetId, {
             transaction: {
