@@ -1,5 +1,6 @@
-import * as yahooStockPrices from "yahoo-stock-prices"
 import * as CurrencyConverter from "currency-converter-lt"
+import {getStockData} from "./yahoo"
+
 const currencyConverter = new CurrencyConverter()
 
 export interface StockHolding {
@@ -26,8 +27,11 @@ export class StockChecker {
 
     public async getTicker(symbol: string): Promise<TickerData> {
         if (this.tickers[symbol]) return this.tickers[symbol]
-        const ticker: TickerData = await yahooStockPrices.getCurrentData(symbol)
-        return this.tickers[symbol] = ticker
+        const ticker = await getStockData([symbol])
+        return this.tickers[symbol] = {
+            currency: ticker[0].currency,
+            price: ticker[0].regularMarketPrice.raw
+        }
     }
 
     public async getRate(from: string, to: string): Promise<number> {

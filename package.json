@@ -8,11 +8,10 @@
     "prestart": "npm run build",
     "start": "node dist/index.js",
     "pretest": "npm run build",
-    "test": "node --test ./dist/*.spec.js"
+    "test": "node --test ./dist/parsers.spec.js ./dist/stocks.spec.js"
   },
   "dependencies": {
     "currency-converter-lt": "^2.0.0-beta.0",
-    "yahoo-stock-prices": "^1.1.0",
     "ynab": "^1.32.0"
   },
   "devDependencies": {
