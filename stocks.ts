@@ -13,6 +13,8 @@ export interface StockValue {
     value: number
     nativeCurrency: string
     nativeValue: number
+    price: number
+    nativePrice: number
 }
 
 export interface TickerData {
@@ -53,7 +55,9 @@ export class StockChecker {
             symbol: holding.symbol,
             value,
             nativeCurrency: ticker.currency,
-            nativeValue: holding.quantity * ticker.price
+            nativeValue: holding.quantity * ticker.price,
+            price: ticker.price * rate,
+            nativePrice: ticker.price,
         }
     }
 
