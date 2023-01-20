@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "currency-converter-lt": "^2.0.0-beta.0",
-    "ynab": "^1.43.0"
+    "ynab": "^1.45.0"
   },
   "devDependencies": {
     "@types/node": "18.x",
