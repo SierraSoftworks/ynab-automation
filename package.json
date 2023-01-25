@@ -8,7 +8,7 @@
     "prestart": "npm run build",
     "start": "node dist/index.js",
     "pretest": "npm run build",
-    "test": "node --test ./dist/parsers.spec.js ./dist/stocks.spec.js"
+    "test": "node --test ./dist/parsers.spec.js ./dist/automations/stocks.spec.js"
   },
   "dependencies": {
     "currency-converter-lt": "^2.0.0-beta.0",
