@@ -1,14 +1,56 @@
 import * as CurrencyConverter from "currency-converter-lt"
-import {getStockData} from "./yahoo"
+import { Automation } from "../automation"
+import { getStockData } from "../utils/yahoo"
+
+import { Account, API, BudgetDetail, SaveTransaction } from "ynab"
 
 const currencyConverter = new CurrencyConverter()
 
-export interface StockHolding {
+export class StockAutomation extends Automation {
+    private stockChecker = new StockChecker()
+
+    public get kind() {
+        return "stocks"
+    }
+
+    public async run(budget: BudgetDetail, account: Account, options: { [key: string]: string }): Promise<void> {
+        const holdings = this.getStocks(options)
+
+        const values = await this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code)
+        if (!values.length) return;
+
+        const shift = Math.floor(values.reduce((sum, stock) => sum + stock.value, 0) * 1000) - account.balance;
+
+        // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
+        if (Math.abs(shift) <= 1000) return;
+
+        await this.api.transactions.createTransaction(budget.id, {
+            transaction: {
+                account_id: account.id,
+                date: new Date().toISOString().split('T')[0],
+                amount: shift,
+                payee_name: options.payee_name || "Stock Market",
+                cleared: SaveTransaction.ClearedEnum.Cleared,
+                approved: true,
+                memo: values.map(v => `${v.symbol}: ${v.nativeCurrency} ${v.nativeValue.toFixed(2)} @ ${v.nativeCurrency} ${v.nativePrice}`).join(', ')
+            }
+        })
+    }
+
+    private getStocks(options: { [key: string]: string }): StockHolding[] {
+        return Object.keys(options).filter(k => k !== "payee_name").map(symbol => ({
+            symbol,
+            quantity: parseFloat(options[symbol])
+        }))
+    }
+}
+
+interface StockHolding {
     symbol: string
     quantity: number
 }
 
-export interface StockValue {
+interface StockValue {
     symbol: string
     value: number
     nativeCurrency: string
@@ -17,7 +59,7 @@ export interface StockValue {
     nativePrice: number
 }
 
-export interface TickerData {
+interface TickerData {
     currency: string
     price: number
 }
@@ -43,7 +85,7 @@ export class StockChecker {
         if (this.rates[conversion]) return this.rates[conversion]
         const inverse = `${to}:${from}`
         const rate = await currencyConverter.from(from).to(to).convert()
-        this.rates[inverse] = 1/rate
+        this.rates[inverse] = 1 / rate
         return this.rates[conversion] = rate
     }
 
