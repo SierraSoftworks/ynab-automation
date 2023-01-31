@@ -40,5 +40,10 @@ describe("parsers", () => {
 
             assert(isStocksTrigger(actual[0]));
         })
+
+        it("should parse quoted options", () => {
+            const actual = parse("/automate:xyz foo=\"bar,baz\"");
+            assert.deepStrictEqual(actual, [{ kind: "xyz", options: { foo: "bar,baz" } }]);
+        })
     })
 })

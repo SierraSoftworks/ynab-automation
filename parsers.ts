@@ -20,9 +20,39 @@ export function parse(note: string): Trigger[] {
 }
 
 function parseOptions(options: string): { [key: string]: string } {
-    return (options || "").split(',').map(o => o.trim()).filter(o => !!o).map(o => o.split('=', 2)).map(o => ({
-        [o[0]]: o[1]
-    })).reduce((a, b) => ({ ...a, ...b }), {})
+    let opts = options;
+    let results = {}
+
+    while (opts) {
+        const key = opts.substring(0, opts.indexOf('=')).trim()
+        const valueBase = opts.substring(opts.indexOf('=') + 1).trim()
+
+        if (valueBase[0] === '"') {
+            const value = valueBase.substring(1, valueBase.indexOf('"', 1))
+            results[key] = value
+
+            if (!~valueBase.indexOf('"', 1)) {
+                throw new Error(`Invalid options string: ${options}`)
+            }
+
+            opts = valueBase.substring(valueBase.indexOf('"', 1) + 1)
+        } else {
+            if (!~valueBase.indexOf(',')) {
+                results[key] = valueBase
+                break
+            }
+            
+            const value = valueBase.substring(0, valueBase.indexOf(','))
+            results[key] = value
+            opts = valueBase.substring(valueBase.indexOf(',') + 1)
+        }
+
+        while (opts.startsWith(',')) {
+            opts = opts.substring(1).trim()
+        }
+    }
+
+    return results
 }
 
 export interface StockTrigger extends Trigger {
