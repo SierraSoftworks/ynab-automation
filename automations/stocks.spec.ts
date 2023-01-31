@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import { describe, it } from "node:test";
 import { StockChecker } from "./stocks";
 
 describe("stocks", () => {

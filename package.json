@@ -4,11 +4,10 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
+    "watch": "ts-mocha --watch --watch-files '**/*.ts' '**/*.spec.ts'",
     "prestart": "npm run build",
     "start": "node dist/index.js",
-    "pretest": "npm run build",
-    "test": "node --test ./dist/parsers.spec.js ./dist/automations/stocks.spec.js"
+    "test": "ts-mocha '**/*.spec.ts'"
   },
   "dependencies": {
     "currency-converter-lt": "^2.0.0-beta.0",
@@ -16,6 +15,9 @@
   },
   "devDependencies": {
     "@types/node": "18.x",
-    "typescript": "^4.9.5"
+    "@types/mocha": "^10.0.1",
+    "@types/expect": "^24.3.0",
+    "typescript": "^4.9.5",
+    "ts-mocha": "^10.0.0"
   }
 }

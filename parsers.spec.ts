@@ -1,4 +1,3 @@
-import { describe, it } from "node:test";
 import * as assert from "assert";
 
 import { isStocksTrigger, parse } from "./parsers"
