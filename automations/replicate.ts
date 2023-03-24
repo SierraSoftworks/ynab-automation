@@ -27,6 +27,10 @@ export class ReplicateAutomation extends Automation {
 
         const diffTransactions = pendingTransactions.filter(t => !replicatedTransactionIds.has(t.import_id))
 
+        if (!diffTransactions.length) {
+            return
+        }
+
         await this.api.transactions.createTransactions(options["to_budget"], {
             transactions: diffTransactions.map(t => ({
                 account_id: targetAccount.id,
