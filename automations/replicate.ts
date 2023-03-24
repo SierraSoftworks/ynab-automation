@@ -77,10 +77,6 @@ export class ReplicateAutomation extends Automation {
             return false
         }
 
-        if (options["from_account"] && transaction.account_name !== options["from_account"]) {
-            return false
-        }
-
         if (options["from_category"] && categoryLookup[transaction.category_id] !== options["from_category"]) {
             return false
         }
