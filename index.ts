@@ -37,8 +37,13 @@ async function updateAccounts(budgetId: string) {
             }
 
             console.log(`Running automation '${automation.kind}' in account '${account.name}'`)
-            await automation.run(budget.data.budget, account, trigger.options)
-            console.log(`Finished running automation '${automation.kind}' in account '${account.name}'`)
+            try {
+                await automation.run(budget.data.budget, account, trigger.options)
+                console.log(`Finished running automation '${automation.kind}' in account '${account.name}'`)
+            } catch (err) {
+                console.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`, err)
+                throw err
+            }
         }))
     }))
 }

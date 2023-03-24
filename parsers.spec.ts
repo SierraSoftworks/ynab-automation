@@ -45,5 +45,10 @@ describe("parsers", () => {
             const actual = parse("/automate:xyz foo=\"bar,baz\"");
             assert.deepStrictEqual(actual, [{ kind: "xyz", options: { foo: "bar,baz" } }]);
         })
+
+        it("should parse a complex real world example", () => {
+            const actual = parse(`/automate:xyz source="foo" dest=bar guid=00000000-0000-0000-0000-000000000000 category="Fox: Hound" sum=10.0`)
+            assert.deepStrictEqual(actual, [{ kind: "xyz", options: { source: "foo", dest: "bar", guid: "00000000-0000-0000-0000-000000000000", category: "Fox: Hound", sum: "10.0" } }]);
+        })
     })
 })

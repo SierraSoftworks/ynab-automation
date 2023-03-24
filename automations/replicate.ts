@@ -9,7 +9,11 @@ export class ReplicateAutomation extends Automation {
     public async run(budget: BudgetDetail, account: Account, options: { [key: string]: string }): Promise<void> {
         const targetBudgetAccounts = await this.api.accounts.getAccounts(options["to_budget"])
         const targetAccount = targetBudgetAccounts.data.accounts.find(a => a.name === options["to_account"])
-        
+
+        if (!targetAccount) {
+            throw new Error(`Could not find target account '${options["to_account"]}' in target budget '${options["to_budget"]}'`)
+        }
+
         const sourceCategories = await this.getCategoriesLookup(budget.id)
         const targetCategories = this.reverseLookup(await this.getCategoriesLookup(options["to_budget"]))
         
@@ -17,7 +21,7 @@ export class ReplicateAutomation extends Automation {
         const pendingTransactions = transactions.data.transactions.filter(t => this.shouldReplicateTransaction(t, sourceCategories, options))
 
         const sinceDate = pendingTransactions.map(t => t.date).sort()[0]
-
+        
         const replicatedTransactions = await this.api.transactions.getTransactionsByAccount(options["to_budget"], targetAccount.id, sinceDate)
         const replicatedTransactionIds = new Set(replicatedTransactions.data.transactions.map(t => t.import_id))
 

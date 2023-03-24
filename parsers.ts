@@ -22,6 +22,7 @@ export function parse(note: string): Trigger[] {
 function parseOptions(options: string): { [key: string]: string } {
     let opts = options;
     let results = {}
+    const optionSeparators = [',', ' ']
 
     while (opts) {
         const key = opts.substring(0, opts.indexOf('=')).trim()
@@ -37,17 +38,24 @@ function parseOptions(options: string): { [key: string]: string } {
 
             opts = valueBase.substring(valueBase.indexOf('"', 1) + 1)
         } else {
-            if (!~valueBase.indexOf(',')) {
+            let hadSeparator = false
+            for (const separator of optionSeparators) {
+                if (!~valueBase.indexOf(separator)) continue;
+
+                const value = valueBase.substring(0, valueBase.indexOf(separator))
+                results[key] = value
+                opts = valueBase.substring(valueBase.indexOf(separator) + 1)
+                hadSeparator = true
+                break
+            }
+
+            if (!hadSeparator) {
                 results[key] = valueBase
                 break
             }
-            
-            const value = valueBase.substring(0, valueBase.indexOf(','))
-            results[key] = value
-            opts = valueBase.substring(valueBase.indexOf(',') + 1)
         }
 
-        while (opts.startsWith(',')) {
+        while (opts.startsWith(' ')) {
             opts = opts.substring(1).trim()
         }
     }
