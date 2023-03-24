@@ -3,6 +3,7 @@ import { buildAutomationMap } from "./automation"
 
 import { parse } from "./parsers"
 import { ApproverAutomation } from "./automations/approve"
+import { BottomlessAutomation } from "./automations/bottomless"
 import { ReplicateAutomation } from "./automations/replicate"
 import { StockAutomation } from "./automations/stocks"
 
@@ -10,14 +11,15 @@ const api = new ynab.API(process.env.YNAB_API_KEY)
 
 const automations = buildAutomationMap([
     new ApproverAutomation(api),
+    new BottomlessAutomation(api),
     new ReplicateAutomation(api),
     new StockAutomation(api),
 ])
 
-const budgetId = process.env.YNAB_BUDGET_ID
+const budgetIds = (process.env.YNAB_BUDGET_IDS?.split(",") || [process.env.YNAB_BUDGET_ID]).filter(x => !!x)
 
-if (!budgetId) {
-    throw new Error("You haven't provided the YNAB_BUDGET_ID environment variable")
+if (!budgetIds.length) {
+    throw new Error("You haven't provided the YNAB_BUDGET_IDS environment variable")
 }
 
 async function updateAccounts(budgetId: string) {
@@ -49,7 +51,7 @@ async function updateAccounts(budgetId: string) {
 }
 
 
-updateAccounts(budgetId).then(() => {
+Promise.all(budgetIds.map(b => updateAccounts(b))).then(() => {
     console.log("Updated YNAB account.")
 }).catch(err => {
     console.error("Failed to update YNAB account.", err)
