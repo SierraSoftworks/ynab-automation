@@ -41,13 +41,6 @@ export class ReplicateAutomation extends Automation {
                 category_id: targetCategories[options["to_category"] || sourceCategories[t.category_id]]
             }))
         })
-
-        await this.api.transactions.updateTransactions(budget.id, {
-            transactions: pendingTransactions.map(t => ({
-                id: t.id,
-                approved: true
-            }))
-        })
     }
 
     private async getCategoriesLookup(budget_id: string): Promise<{ [id: string]: string }> {
