@@ -2,11 +2,15 @@ import * as ynab from "ynab"
 import { buildAutomationMap } from "./automation"
 
 import { parse } from "./parsers"
+import { ApproverAutomation } from "./automations/approve"
+import { ReplicateAutomation } from "./automations/replicate"
 import { StockAutomation } from "./automations/stocks"
 
 const api = new ynab.API(process.env.YNAB_API_KEY)
 
 const automations = buildAutomationMap([
+    new ApproverAutomation(api),
+    new ReplicateAutomation(api),
     new StockAutomation(api),
 ])
 
