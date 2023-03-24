@@ -21,7 +21,7 @@ export class ReplicateAutomation extends Automation {
         const pendingTransactions = transactions.data.transactions.filter(t => this.shouldReplicateTransaction(t, sourceCategories, options))
 
         const sinceDate = pendingTransactions.map(t => t.date).sort()[0]
-        
+
         const replicatedTransactions = await this.api.transactions.getTransactionsByAccount(options["to_budget"], targetAccount.id, sinceDate)
         const replicatedTransactionIds = new Set(replicatedTransactions.data.transactions.map(t => t.import_id))
 
@@ -37,6 +37,7 @@ export class ReplicateAutomation extends Automation {
                 flag_color: (options["to_flag"] ? options["to_flag"] : t.flag_color) as TransactionDetail.FlagColorEnum,
                 payee_name: t.payee_name,
                 memo: t.memo,
+                cleared: t.cleared,
                 category_id: targetCategories[options["to_category"] || sourceCategories[t.category_id]]
             }))
         })
