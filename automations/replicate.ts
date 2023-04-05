@@ -87,6 +87,10 @@ export class ReplicateAutomation extends Automation {
             return false
         }
 
+        if (options["cleared"] === "yes" && transaction.cleared === TransactionDetail.ClearedEnum.Uncleared) {
+            return false
+        }
+
         return true
     }
 }
