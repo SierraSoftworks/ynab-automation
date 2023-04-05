@@ -11,6 +11,10 @@ export class ApproverAutomation extends Automation {
         const transactions = await this.api.transactions.getTransactionsByAccount(budget.id, account.id)
         const pendingTransactions = transactions.data.transactions.filter(t => this.shouldApproveTransaction(t, options))
 
+        if (!pendingTransactions.length) {
+            return
+        }
+
         await this.api.transactions.updateTransactions(budget.id, {
             transactions: pendingTransactions.map(t => ({
                 id: t.id,
