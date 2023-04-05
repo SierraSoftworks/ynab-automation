@@ -18,5 +18,5 @@ jobs:
       - run: npm run start
         env:
           YNAB_API_KEY: '${{ secrets.YNAB_API_KEY }}'
-          YNAB_BUDGET_ID: '${{ secrets.YNAB_BUDGET_ID }}'
+          YNAB_BUDGET_IDS: '${{ secrets.YNAB_BUDGET_IDS }}'
   
