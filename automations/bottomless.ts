@@ -15,7 +15,7 @@ export class BottomlessAutomation extends Automation {
                     amount: -account.balance,
                     date: new Date().toISOString().split('T')[0],
                     payee_name: options["name"] || "Bottomless Pit",
-                    approved: options["approved"] === "true"
+                    approved: options["approved"] === "yes"
                 }
             })
         }
