@@ -13,6 +13,7 @@ export class BottomlessAutomation extends Automation {
                 transaction: {
                     account_id: account.id,
                     amount: -account.balance,
+                    date: new Date().toISOString().split('T')[0],
                     payee_name: options["name"] || "Bottomless Pit",
                     approved: options["approved"] === "true"
                 }
