@@ -66,11 +66,29 @@ export interface CurrencyData {
     typeDisp: string
 }
 
+async function fetchSafe<T>(url: string, attempts: number = 3): Promise<T> {
+    while (attempts-- > 0) {
+        const response = await fetch(url)
+        if (response.ok) {
+            return await response.json()
+        }
+
+        if (!attempts) {
+            throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+        }
+
+        // Delay for 1s between retries
+        await new Promise((result) => {
+            setTimeout(() => result(null), 1000)
+        })
+    }
+}
+
 export async function getStockData(symbols: string[]): Promise<StockData[]> {
     symbols = symbols.map(s => s.toUpperCase())
 
     const url = `${stockBaseUrl}&symbols=${symbols.join(',')}`
-    const response = await fetch(url).then(r => r.json())
+    const response: any = await fetchSafe(url)
     return response.quoteResponse.result
 }
 
@@ -83,6 +101,6 @@ export async function getCurrencyData(from: string, to: string): Promise<Currenc
     }
 
     const url = `${currencyBaseUrl}&symbols=${from}${to}=X`
-    const response = await fetch(url).then(r => r.json())
+    const response: any = await fetchSafe(url)
     return response.quoteResponse.result
 }
