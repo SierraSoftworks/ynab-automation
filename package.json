@@ -13,7 +13,7 @@
     "ynab": "^1.49.0"
   },
   "devDependencies": {
-    "@types/node": "18.x",
+    "@types/node": "20.x",
     "@types/mocha": "^10.0.1",
     "@types/expect": "^24.3.0",
     "typescript": "^5.0.4",
