@@ -1,10 +1,7 @@
-import * as CurrencyConverter from "currency-converter-lt"
 import { Automation } from "../automation"
-import { getStockData } from "../utils/yahoo"
+import { getCurrencyData, getStockData } from "../utils/yahoo"
 
 import { Account, API, BudgetDetail, SaveTransaction } from "ynab"
-
-const currencyConverter = new CurrencyConverter()
 
 export class StockAutomation extends Automation {
     private stockChecker = new StockChecker()
@@ -71,10 +68,10 @@ export class StockChecker {
 
     public async getTicker(symbol: string): Promise<TickerData> {
         if (this.tickers[symbol]) return this.tickers[symbol]
-        const ticker = await getStockData([symbol])
+        const ticker = await getStockData(symbol)
         return this.tickers[symbol] = {
-            currency: ticker[0].currency,
-            price: ticker[0].regularMarketPrice.raw
+            currency: ticker.currency,
+            price: ticker.regularMarketPrice.raw
         }
     }
 
@@ -84,9 +81,9 @@ export class StockChecker {
         const conversion = `${from}:${to}`
         if (this.rates[conversion]) return this.rates[conversion]
         const inverse = `${to}:${from}`
-        const rate = await currencyConverter.from(from).to(to).convert()
-        this.rates[inverse] = 1 / rate
-        return this.rates[conversion] = rate
+        const rate = await getCurrencyData(from, to)
+        this.rates[inverse] = 1 / rate.regularMarketPrice.raw
+        return this.rates[conversion] = rate.regularMarketPrice.raw
     }
 
     public async getStockValue(holding: StockHolding, targetCurrency: string): Promise<StockValue> {

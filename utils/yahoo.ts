@@ -1,8 +1,8 @@
 import {request} from "https"
 
-const stockBaseUrl = "https://query2.finance.yahoo.com/v7/finance/quote?formatted=true&lang=en-US&region=US&fields=longName,shortName,marketCap,underlyingSymbol,underlyingExchangeSymbol,headSymbolAsString,regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketVolume,regularMarketOpen,toCurrency,fromCurrency"
+const stockUrl = "https://query1.finance.yahoo.com/v11/finance/quoteSummary/{SYMBOL}?modules=price"
 
-const currencyBaseUrl = "https://query2.finance.yahoo.com/v7/finance/quote?formatted=true&lang=en-US&region=US&fields=regularMarketPrice,toCurrency,fromCurrency,shortName"
+const currencyUrl = "https://query1.finance.yahoo.com/v11/finance/quoteSummary/{FROM_SYMBOL}{TO_SYMBOL}=X?modules=price"
 
 interface NumericalValue {
     raw: number
@@ -11,63 +11,28 @@ interface NumericalValue {
 }
 
 export interface StockData {
-    cryptoTradeable: boolean
-    currency: string
-    customPriceAlertConfidence: string
-    exchange: string
-    exchangeTimezoneShortName: string
-    exhangeTimezoneName: string
-    firstTradeDateMilliseconds: number
-    fullExchangeName: string
-    language: string
-    longName: string
-    market: string
-    marketCap: NumericalValue
-    marketState: string
-    priceHint: number
-    quoteSourceName: string
-    quoteType: string
-    region: string
-    regularMarketChange: NumericalValue
-    regularMarketChangePercent: NumericalValue
-    regularMarketOpen: NumericalValue
-    regularMarketPreviousClose: NumericalValue
-    regularMarketPrice: NumericalValue
-    regularMarketTime: NumericalValue
-    regularMarketVolume: NumericalValue
-    shortName: string
-    sourceInterval: number
     symbol: string
-    tradeable: boolean
-    typeDisp: string
+    shortName: string
+    longName: string
+    exchange: string
+    exchangeName: string
+    currency: string
+    currencySymbol: string
+    regularMarketPrice: NumericalValue
 }
 
 export interface CurrencyData {
-    cryptoTradeable: boolean
     currency: string
-    customPriceAlertConfidence: string
-    exchange: string
-    exchangeTimezoneName: string
-    exchangeTimezoneShortName: string
-    firstTradeDateMilliseconds: number
-    fullExchangeName: string
-    langauge: string
-    market: string
-    marketState: string
-    priceHint: number
-    quoteSourceName: string
-    quoteType: string
-    region: string
-    regularMarketPrice: NumericalValue
-    regularMarketTime: NumericalValue
+    currencySymbol: string
     shortName: string
-    sourceInterfal: number
-    symbol: string
-    typeDisp: string
+    longName: string
+    regularMarketPrice: NumericalValue
 }
 
 async function fetchSafe<T>(url: string, attempts: number = 3): Promise<T> {
-    while (attempts-- > 0) {
+    while (true) {
+        attempts -= 1
+
         const response = await fetch(url)
         if (response.ok) {
             return await response.json()
@@ -78,29 +43,23 @@ async function fetchSafe<T>(url: string, attempts: number = 3): Promise<T> {
         }
 
         // Delay for 1s between retries
-        await new Promise((result) => {
-            setTimeout(() => result(null), 1000)
+        await new Promise<null>((resolve) => {
+            setTimeout(() => resolve(null), 500)
         })
     }
 }
 
-export async function getStockData(symbols: string[]): Promise<StockData[]> {
-    symbols = symbols.map(s => s.toUpperCase())
-
-    const url = `${stockBaseUrl}&symbols=${symbols.join(',')}`
+export async function getStockData(symbol: string): Promise<StockData> {
+    const url = stockUrl.replace('{SYMBOL}', encodeURIComponent(symbol))
     const response: any = await fetchSafe(url)
-    return response.quoteResponse.result
+    return response.quoteSummary.result[0].price
 }
 
-export async function getCurrencyData(from: string, to: string): Promise<CurrencyData[]> {
+export async function getCurrencyData(from: string, to: string): Promise<CurrencyData> {
     from = from.toUpperCase()
     to = to.toUpperCase()
 
-    if (from === "USD") {
-        from = ""
-    }
-
-    const url = `${currencyBaseUrl}&symbols=${from}${to}=X`
+    const url = currencyUrl.replace('{FROM_SYMBOL}', encodeURIComponent(from)).replace('{TO_SYMBOL}', encodeURIComponent(to))
     const response: any = await fetchSafe(url)
-    return response.quoteResponse.result
+    return response.quoteSummary.result[0].price
 }
