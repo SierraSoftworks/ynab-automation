@@ -10,7 +10,7 @@
     "test": "ts-mocha '**/*.spec.ts'"
   },
   "dependencies": {
-    "ynab": "^1.49.0"
+    "ynab": "^1.55.0"
   },
   "devDependencies": {
     "@types/node": "20.x",
