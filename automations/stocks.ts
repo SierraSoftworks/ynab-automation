@@ -1,5 +1,5 @@
 import { Automation } from "../automation"
-import { getCurrencyData, getStockData } from "../utils/yahoo"
+import { getCurrencyData, getStockData } from "../utils/alphavantage"
 
 import { Account, API, BudgetDetail, SaveTransaction } from "ynab"
 
@@ -71,7 +71,7 @@ export class StockChecker {
         const ticker = await getStockData(symbol)
         return this.tickers[symbol] = {
             currency: ticker.currency,
-            price: ticker.regularMarketPrice.raw
+            price: ticker.price
         }
     }
 
@@ -82,8 +82,8 @@ export class StockChecker {
         if (this.rates[conversion]) return this.rates[conversion]
         const inverse = `${to}:${from}`
         const rate = await getCurrencyData(from, to)
-        this.rates[inverse] = 1 / rate.regularMarketPrice.raw
-        return this.rates[conversion] = rate.regularMarketPrice.raw
+        this.rates[inverse] = 1 / rate
+        return this.rates[conversion] = rate
     }
 
     public async getStockValue(holding: StockHolding, targetCurrency: string): Promise<StockValue> {

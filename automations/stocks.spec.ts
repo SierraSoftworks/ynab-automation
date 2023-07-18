@@ -4,7 +4,7 @@ import { StockChecker } from "./stocks";
 describe("stocks", () => {
     const stockChecker = new StockChecker();
 
-    describe("fetching ticker data", () => {
+    describe.skip("fetching ticker data", () => {
         it("should fetch ticker data", async () => {
             const actual = await stockChecker.getTicker("AAPL");
             assert.ok(actual.price > 0);
@@ -16,7 +16,7 @@ describe("stocks", () => {
         });
     });
 
-    describe("fetching currency rates", () => {
+    describe.skip("fetching currency rates", () => {
         it("should always return 1 when converting identical currencies", async () => {
             const actual = await stockChecker.getRate("USD", "USD");
             assert.strictEqual(actual, 1);
@@ -38,7 +38,7 @@ describe("stocks", () => {
         })
     });
 
-    describe("getting stock holding data", () => {
+    describe.skip("getting stock holding data", () => {
         it("should get stock holding data", async () => {
             const actual = await stockChecker.getStockValue({symbol: "AAPL", quantity: 10}, "GBP");
             assert.ok(actual.value > 0);

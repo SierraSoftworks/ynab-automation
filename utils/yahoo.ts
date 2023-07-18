@@ -1,4 +1,4 @@
-import {request} from "https"
+import {fetchSafe} from "./http"
 
 const stockUrl = "https://query1.finance.yahoo.com/v11/finance/quoteSummary/{SYMBOL}?modules=price"
 
@@ -27,26 +27,6 @@ export interface CurrencyData {
     shortName: string
     longName: string
     regularMarketPrice: NumericalValue
-}
-
-async function fetchSafe<T>(url: string, attempts: number = 3): Promise<T> {
-    while (true) {
-        attempts -= 1
-
-        const response = await fetch(url)
-        if (response.ok) {
-            return await response.json()
-        }
-
-        if (!attempts) {
-            throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-        }
-
-        // Delay for 1s between retries
-        await new Promise<null>((resolve) => {
-            setTimeout(() => resolve(null), 500)
-        })
-    }
 }
 
 export async function getStockData(symbol: string): Promise<StockData> {
