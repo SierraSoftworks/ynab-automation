@@ -1,5 +1,5 @@
 import { Automation } from "../automation"
-import { Account, API, BudgetDetail, TransactionDetail } from "ynab"
+import { Account, API, BudgetDetail, TransactionDetail, TransactionDetailClearedEnum } from "ynab"
 
 
 export class ApproverAutomation extends Automation {
@@ -25,7 +25,7 @@ export class ApproverAutomation extends Automation {
 
     private shouldApproveTransaction(transaction: TransactionDetail, options: { [key: string]: string }): boolean {
         return !transaction.approved &&
-            (options.cleared === "yes" ? transaction.cleared !== TransactionDetail.ClearedEnum.Uncleared : true) &&
+            (options.cleared === "yes" ? transaction.cleared !== TransactionDetailClearedEnum.Uncleared : true) &&
             (options.imported === "yes" ? transaction.import_id !== null : true)
     }
 }

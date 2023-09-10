@@ -1,7 +1,7 @@
 import { Automation } from "../automation"
 import { getCurrencyData, getStockData } from "../utils/alphavantage"
 
-import { Account, API, BudgetDetail, SaveTransaction } from "ynab"
+import { Account, API, BudgetDetail, SaveTransaction, SaveTransactionClearedEnum } from "ynab"
 
 export class StockAutomation extends Automation {
     private stockChecker = new StockChecker()
@@ -27,7 +27,7 @@ export class StockAutomation extends Automation {
                 date: new Date().toISOString().split('T')[0],
                 amount: shift,
                 payee_name: options.payee_name || "Stock Market",
-                cleared: SaveTransaction.ClearedEnum.Cleared,
+                cleared: SaveTransactionClearedEnum.Cleared,
                 approved: true,
                 memo: values.map(v => `${v.symbol}: ${v.nativeCurrency} ${v.nativeValue.toFixed(2)} @ ${v.nativeCurrency} ${v.nativePrice}`).join(', ')
             }
