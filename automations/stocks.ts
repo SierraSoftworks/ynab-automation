@@ -1,5 +1,5 @@
 import { Automation } from "../automation"
-import { getCurrencyData, getStockData } from "../utils/alphavantage"
+import { getCurrencyData, getStockData } from "../utils/tiingo"
 
 import { Account, API, BudgetDetail, SaveTransaction, SaveTransactionClearedEnum } from "ynab"
 
