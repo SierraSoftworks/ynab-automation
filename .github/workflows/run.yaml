@@ -20,4 +20,5 @@ jobs:
           YNAB_API_KEY: '${{ secrets.YNAB_API_KEY }}'
           YNAB_BUDGET_IDS: '${{ secrets.YNAB_BUDGET_IDS }}'
           ALPHAVANTAGE_API_KEY: '${{ secrets.ALPHAVANTAGE_API_KEY }}'
+          TIINGO_API_KEY: '${{ secrets.TIINGO_API_KEY }}'
   
