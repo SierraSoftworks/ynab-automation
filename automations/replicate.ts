@@ -1,5 +1,5 @@
 import {Automation} from "../automation"
-import {Account, API, BudgetDetail, TransactionDetail, TransactionDetailClearedEnum, TransactionDetailFlagColorEnum} from "ynab"
+import {Account, API, BudgetDetail, TransactionClearedStatus, TransactionDetail, TransactionFlagColor } from "ynab"
 
 export class ReplicateAutomation extends Automation {
     public get kind() {
@@ -38,7 +38,7 @@ export class ReplicateAutomation extends Automation {
                 approved: true,
                 date: t.date,
                 import_id: t.import_id,
-                flag_color: (options["to_flag"] ? options["to_flag"] : t.flag_color) as TransactionDetailFlagColorEnum,
+                flag_color: (options["to_flag"] ? options["to_flag"] : t.flag_color) as TransactionFlagColor,
                 payee_name: t.payee_name,
                 memo: t.memo,
                 cleared: t.cleared,
@@ -87,7 +87,7 @@ export class ReplicateAutomation extends Automation {
             return false
         }
 
-        if (options["cleared"] === "yes" && transaction.cleared === TransactionDetailClearedEnum.Uncleared) {
+        if (options["cleared"] === "yes" && transaction.cleared === TransactionClearedStatus.Uncleared) {
             return false
         }
 
