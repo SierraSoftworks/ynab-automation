@@ -1,0 +1,39 @@
+on: pull_request
+name: Update Package
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]' && github.event.action == 'opened'
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: gh pr checkout ${{ github.event.pull_request.number }}
+        name: Checkout PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - run: |
+          git config --global user.name "dependabot[bot]"
+          git config --global user.email "dependabot[bot]@users.noreply.github.com"
+        name: Configure git user
+      - run: |
+          git add dist/
+          git commit -m "chore: Update compiled package"
+          git push
+        name: Push updated package
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  
