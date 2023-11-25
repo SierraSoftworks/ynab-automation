@@ -89680,10 +89680,17 @@ const path = __nccwpck_require__(9411);
 class DataSource {
     constructor(id) {
         this.id = id;
+        this.cacheEnabled = true;
         this.cacheDirectory = path.join(process.cwd(), ".ynab-cache", id);
+    }
+    disableCache() {
+        this.cacheEnabled = false;
     }
     cached(key, expiry, hydrate) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!this.cacheEnabled) {
+                return yield hydrate();
+            }
             yield fs.promises.mkdir(this.cacheDirectory, { recursive: true });
             const cachePath = this.getCachePath(key, expiry);
             return yield fs.promises.readFile(cachePath, { encoding: "utf-8" })
@@ -89726,14 +89733,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Yahoo = void 0;
+const node_crypto_1 = __nccwpck_require__(6005);
 const http_1 = __nccwpck_require__(9190);
 const datasource_1 = __nccwpck_require__(5046);
+const validUserAgents = [
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.1; rv:109.0) Gecko/20100101 Firefox/120.0",
+    "Mozilla/5.0 (X11; Linux i686; rv:109.0) Gecko/20100101 Firefox/120.0"
+];
 class Yahoo extends datasource_1.DataSource {
     constructor() {
         super("yahoo");
         this.headers = {
             "Accept": "application/json, text/javascript, text/plain, */*; q=0.01",
-            "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+            "User-Agent": validUserAgents[(0, node_crypto_1.randomInt)(validUserAgents.length)],
         };
     }
     getStockData(symbol) {
@@ -89783,7 +89799,11 @@ class Yahoo extends datasource_1.DataSource {
             if (this.crumb)
                 return;
             this.cookie = yield this.getSessionCookie();
+            if (!this.cookie)
+                throw new Error("Failed to get session cookie");
             this.crumb = yield this.getSessionCrumb(this.cookie);
+            if (!this.crumb)
+                throw new Error("Failed to get session crumb");
         });
     }
     getSessionCookie() {
@@ -89797,7 +89817,7 @@ class Yahoo extends datasource_1.DataSource {
     }
     getSessionCrumb(sessionCookie) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
+            const response = yield fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
                 headers: Object.assign({}, this.headers, {
                     "Cookie": sessionCookie
                 }),
