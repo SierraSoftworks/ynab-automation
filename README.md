@@ -7,16 +7,22 @@ common account management tasks in [You Need a Budget](https://www.youneedabudge
 ## Features
  - **Keep a Stock Account's value up to date.**
 
-   By specifying the number of shares for each ticker as a note on your stock account,
-   this action can automatically fetch the latest stock price from Yahoo! Finance and
-   update your account's balance (it even supports currency conversion).
+    By specifying the number of shares for each ticker as a note on your stock account,
+    this action can automatically fetch the latest stock price from Yahoo! Finance and
+    update your account's balance (it even supports currency conversion).
 
  - **Automatically approve transactions.**
 
-   If you're using YNAB's support for account linking, you might get tired of needing
-   to approve every transaction which is automatically imported. This action can take
-   the toil out of it for you by automatically approving imported transactions which
-   have cleared in your account(s).
+    If you're using YNAB's support for account linking, you might get tired of needing
+    to approve every transaction which is automatically imported. This action can take
+    the toil out of it for you by automatically approving imported transactions which
+    have cleared in your account(s).
+
+- **Replicate transactions between budgets.**
+
+    If you're using multiple YNAB budgets to provide a shared household budget while retaining
+    your own personal budgets, you'll find that this action can take care of automatically
+    copying transactions from one budget to another.
 
 ## Setup
 1. Create a new YNAB Personal API Token by following their [guide](https://api.youneedabudget.com/#personal-access-tokens).
@@ -89,7 +95,7 @@ Fortunately, this automation allows you to automatically replicate transactions 
 budget to another by adding a note to your account with the following content:
 
 ```
-automate:replicate to_budget=Household from_category=Groceries to_category=Food cleared=yes to_flag=blue
+automate:replicate to_budget=Household to_account=Alice from_category=Groceries to_category=Food cleared=yes to_flag=blue
 ```
 
 ### Automated Approvals
