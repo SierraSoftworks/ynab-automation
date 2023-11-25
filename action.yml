@@ -1,6 +1,9 @@
 name: 'You Need a Budget Automation'
 description: 'Automate your YNAB budgeting with this GitHub Action, providing automated approval, replication, and stock portfolio tracking.'
 author: 'Sierra Softworks'
+branding:
+  color: blue
+  icon: 'dollar-sign'
 
 # Define your inputs here.
 inputs:
