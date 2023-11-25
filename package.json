@@ -15,10 +15,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build index.ts -o dist",
     "watch": "ts-mocha --watch --watch-files '**/*.ts' '**/*.spec.ts'",
-    "prestart": "npm run build",
-    "start": "node dist/index.js",
     "test": "ts-mocha '**/*.spec.ts'"
   },
   "dependencies": {
@@ -30,6 +28,7 @@
     "@types/node": "20.x",
     "@types/mocha": "^10.0.6",
     "@types/expect": "^24.3.0",
+    "@vercel/ncc": "^0.38.1",
     "typescript": "^5.3.2",
     "ts-mocha": "^10.0.0"
   }
