@@ -1,18 +1,38 @@
 import * as assert from "assert";
 import { StockChecker } from "./stocks";
+import { CurrencyDataSource, StockDataSource } from "../datasources/datasource";
 
 describe("stocks", () => {
-    const stockChecker = new StockChecker();
+    class MockDataSource implements StockDataSource, CurrencyDataSource {
+        async getStockData(symbol: string): Promise<{
+            symbol: string;
+            currency: string;
+            price: number;
+        }> {
+            return {
+                symbol,
+                currency: "USD",
+                price: 100
+            }
+        }
+
+        async getCurrencyData(from: string, to: string): Promise<number> {
+            if (from === to) return 1
+            return 0.5
+        }
+    }
+
+    const stockChecker = new StockChecker(new MockDataSource(), new MockDataSource());
 
     describe.skip("fetching ticker data", () => {
         it("should fetch ticker data", async () => {
             const actual = await stockChecker.getTicker("AAPL");
-            assert.ok(actual.price > 0);
+            assert.ok(actual.price === 100);
         });
 
         it("should cache ticker data", async () => {
             const actual = await stockChecker.getTicker("AAPL");
-            assert.ok(actual.price > 0);
+            assert.ok(actual.price === 100);
         });
     });
 
@@ -24,17 +44,17 @@ describe("stocks", () => {
 
         it("should fetch currency rates", async () => {
             const actual = await stockChecker.getRate("USD", "GBP");
-            assert.ok(actual > 0);
+            assert.ok(actual === 0.5);
         });
 
         it("should cache currency rates", async () => {
             const actual = await stockChecker.getRate("USD", "GBP");
-            assert.ok(actual > 0);
+            assert.ok(actual === 0.5);
         });
 
         it("should cache the inverse rates", async () => {
             const actual = await stockChecker.getRate("GBP", "USD");
-            assert.ok(actual > 0);
+            assert.ok(actual === 2);
         })
     });
 

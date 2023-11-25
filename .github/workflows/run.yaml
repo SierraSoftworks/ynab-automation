@@ -13,12 +13,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - run: npm ci
-      - run: npm run start
-        env:
-          YNAB_API_KEY: '${{ secrets.YNAB_API_KEY }}'
-          YNAB_BUDGET_IDS: '${{ secrets.YNAB_BUDGET_IDS }}'
-          ALPHAVANTAGE_API_KEY: '${{ secrets.ALPHAVANTAGE_API_KEY }}'
-          TIINGO_API_KEY: '${{ secrets.TIINGO_API_KEY }}'
+          node-version: '20'
+
+      - uses: ./
+        name: "Personal Budget"
+        with:
+          budget_id: "${{ secrets.YNAB_BUDGET_ID_PERSONAL }}"
+          api_key: "${{ secrets.YNAB_API_KEY }}"
+          cache: true
+
+      - uses: ./
+        name: "Household Budget"
+        with:
+          budget_id: "${{ secrets.YNAB_BUDGET_ID_HOUSEHOLD }}"
+          api_key: "${{ secrets.YNAB_API_KEY }}"
+          cache: true
   

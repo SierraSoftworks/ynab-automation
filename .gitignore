@@ -23,7 +23,7 @@ appsettings.json
 local.settings.json
 
 node_modules
-dist
+.ynab-cache
 
 # Local python packages
 .python_packages/
