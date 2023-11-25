@@ -1,0 +1,26 @@
+name: 'You Need a Budget Automation'
+description: 'Automate your YNAB budgeting with this GitHub Action, providing automated approval, replication, and stock portfolio tracking.'
+author: 'Sierra Softworks'
+
+# Define your inputs here.
+inputs:
+  budget_id:
+    description: 'The YNAB budget ID which you would like this action to operate against.'
+    required: false
+    default: "default"
+  api_key:
+    description: 'The YNAB API key which you would like this action to use. You can find your API key at https://app.ynab.com/settings/developer'
+    required: true
+  cache:
+    description: 'Whether the cache should be enabled for use with this action.'
+    required: false
+    default: "true"
+  
+# Define your outputs here.
+outputs:
+  success:
+    description: 'Indicates whether your YNAB account was updated successfully or not.'
+
+runs:
+  using: node20
+  main: dist/index.js

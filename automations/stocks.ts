@@ -1,10 +1,16 @@
 import { Automation } from "../automation"
-import { getCurrencyData, getStockData } from "../utils/tiingo"
+import { StockDataSource, CurrencyDataSource } from "../datasources/datasource"
 
 import { Account, API, BudgetDetail, SaveTransaction, TransactionClearedStatus } from "ynab"
 
 export class StockAutomation extends Automation {
-    private stockChecker = new StockChecker()
+    constructor(api: API, stocks: StockDataSource, currencies: CurrencyDataSource) {
+        super(api)
+
+        this.stockChecker = new StockChecker(stocks, currencies)
+    }
+
+    private stockChecker: StockChecker
 
     public get kind() {
         return "stocks"
@@ -62,13 +68,15 @@ interface TickerData {
 }
 
 export class StockChecker {
+    constructor(protected stocks: StockDataSource, protected currencies: CurrencyDataSource) { }
+
     private readonly tickers: { [symbol: string]: TickerData } = {}
 
     private readonly rates: { [conversion: string]: number } = {}
 
     public async getTicker(symbol: string): Promise<TickerData> {
         if (this.tickers[symbol]) return this.tickers[symbol]
-        const ticker = await getStockData(symbol)
+        const ticker = await this.stocks.getStockData(symbol)
         return this.tickers[symbol] = {
             currency: ticker.currency,
             price: ticker.price
@@ -81,7 +89,7 @@ export class StockChecker {
         const conversion = `${from}:${to}`
         if (this.rates[conversion]) return this.rates[conversion]
         const inverse = `${to}:${from}`
-        const rate = await getCurrencyData(from, to)
+        const rate = await this.currencies.getCurrencyData(from, to)
         this.rates[inverse] = 1 / rate
         return this.rates[conversion] = rate
     }

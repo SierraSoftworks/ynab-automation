@@ -2,7 +2,7 @@ export function buildUrl(template: string, params: { [key: string]: string }): s
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''))
 }
 
-export async function fetchSafe<T>(url: string, attempts: number = 3, options: RequestInit = {}): Promise<T> {
+export async function fetchSafe<T>(url: string, options: RequestInit = {}, attempts: number = 3): Promise<T> {
     while (true) {
         attempts -= 1
 

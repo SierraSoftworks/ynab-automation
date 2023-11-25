@@ -1,7 +1,19 @@
 {
-  "name": "ynab-stock",
+  "name": "ynab-githubactions",
   "version": "1.0.0",
-  "description": "",
+  "description": "A GitHub Action which allows you to automate tasks within your YNAB account.",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SierraSoftworks/ynab-githubactions.git"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "watch": "ts-mocha --watch --watch-files '**/*.ts' '**/*.spec.ts'",
@@ -10,6 +22,8 @@
     "test": "ts-mocha '**/*.spec.ts'"
   },
   "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/cache": "3.2.2",
     "ynab": "^2.2.0"
   },
   "devDependencies": {
