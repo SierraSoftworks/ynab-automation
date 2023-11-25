@@ -7,11 +7,11 @@ branding:
 
 # Define your inputs here.
 inputs:
-  budget_id:
+  budget-id:
     description: 'The YNAB budget ID which you would like this action to operate against.'
     required: false
     default: "default"
-  api_key:
+  api-key:
     description: 'The YNAB API key which you would like this action to use. You can find your API key at https://app.ynab.com/settings/developer'
     required: true
   cache:

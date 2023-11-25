@@ -89866,7 +89866,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const cacheEnabled = core.getBooleanInput("cache", { required: false });
         try {
-            const apiKey = core.getInput("api_key", { trimWhitespace: true, required: true });
+            const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true });
             const api = new ynab.API(apiKey);
             if (cacheEnabled) {
                 yield cache.restoreCache([".ynab-cache"], "ynab-cache");
@@ -89878,7 +89878,7 @@ function run() {
                 new replicate_1.ReplicateAutomation(api),
                 new stocks_1.StockAutomation(api, yahoo, yahoo),
             ]);
-            const budgetId = core.getInput("budget_id", { trimWhitespace: true, required: false }) || "default";
+            const budgetId = core.getInput("budget-id", { trimWhitespace: true, required: false }) || "default";
             const budget = yield api.budgets.getBudgetById(budgetId);
             const accounts = yield api.accounts.getAccounts(budget.data.budget.id);
             yield Promise.all(accounts.data.accounts.map((account) => __awaiter(this, void 0, void 0, function* () {

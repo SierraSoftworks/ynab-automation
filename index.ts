@@ -17,7 +17,7 @@ async function run() {
 
     try
     {
-        const apiKey = core.getInput("api_key", { trimWhitespace: true, required: true })
+        const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true })
         const api = new ynab.API(apiKey)
 
 
@@ -34,7 +34,7 @@ async function run() {
             new StockAutomation(api, yahoo, yahoo),
         ])
 
-        const budgetId = core.getInput("budget_id", { trimWhitespace: true, required: false }) || "default"
+        const budgetId = core.getInput("budget-id", { trimWhitespace: true, required: false }) || "default"
 
         const budget = await api.budgets.getBudgetById(budgetId)
         const accounts = await api.accounts.getAccounts(budget.data.budget.id)
