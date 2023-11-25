@@ -43,7 +43,7 @@ common account management tasks in [You Need a Budget](https://www.youneedabudge
      automate-ynab:
        runs-on: ubuntu-latest
        steps:
-         - uses: sierrasoftworks/ynab-automation@v2
+         - uses: SierraSoftworks/ynab-automation@v2.0
            with:
              budget-id: ${{ secrets.YNAB_BUDGET_ID }}
              api-key: ${{ secrets.YNAB_API_KEY }}
