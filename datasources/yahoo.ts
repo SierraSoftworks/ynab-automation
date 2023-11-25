@@ -1,5 +1,15 @@
+import { randomInt } from "node:crypto"
 import {buildUrl, fetchSafe} from "../utils/http"
 import {CurrencyDataSource, DataSource, StockDataSource} from "./datasource"
+
+const validUserAgents = [
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.1; rv:109.0) Gecko/20100101 Firefox/120.0",
+    "Mozilla/5.0 (X11; Linux i686; rv:109.0) Gecko/20100101 Firefox/120.0"
+]
 
 export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSource {
     constructor() {
@@ -8,7 +18,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
 
     private headers = {
         "Accept": "application/json, text/javascript, text/plain, */*; q=0.01",
-        "User-Agent": 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+        "User-Agent": validUserAgents[randomInt(validUserAgents.length)],
     }
 
     private cookie: string
@@ -70,7 +80,12 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
         if (this.crumb) return
 
         this.cookie = await this.getSessionCookie()
+
+        if (!this.cookie) throw new Error("Failed to get session cookie")
+        
         this.crumb = await this.getSessionCrumb(this.cookie)
+
+        if (!this.crumb) throw new Error("Failed to get session crumb")
     }
 
     private async getSessionCookie(): Promise<string> {
@@ -84,7 +99,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
     }
 
     private async getSessionCrumb(sessionCookie: string): Promise<string> {
-        const response = await fetch("https://query2.finance.yahoo.com/v1/test/getcrumb", {
+        const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
             headers: Object.assign({}, this.headers, {
                 "Cookie": sessionCookie
             }),

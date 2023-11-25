@@ -10,8 +10,18 @@ export class DataSource {
     }
 
     private cacheDirectory: string
+    private cacheEnabled = true
+
+    disableCache() {
+        this.cacheEnabled = false
+    }
 
     protected async cached<T>(key: string, expiry: CacheExpiryTime, hydrate: () => Promise<T>): Promise<T> {
+        if (!this.cacheEnabled)
+        {
+            return await hydrate()
+        }
+
         await fs.promises.mkdir(this.cacheDirectory, { recursive: true })
         const cachePath = this.getCachePath(key, expiry)
 

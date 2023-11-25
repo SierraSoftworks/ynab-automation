@@ -3,6 +3,7 @@ import {Tiingo} from "./tiingo"
 
 describe.skip("Tiingo Stock API", () => {
     const tiingo = new Tiingo(process.env.TIINGO_API_KEY)
+    tiingo.disableCache()
 
     describe("getCurrencyData", () => {
         it("should return currency data for a pair of currencies", async () => {

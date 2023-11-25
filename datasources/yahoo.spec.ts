@@ -3,6 +3,7 @@ import {Yahoo} from "./yahoo"
 
 describe("yahoo markets", () => {
     const yahoo = new Yahoo()
+    yahoo.disableCache()
 
     describe("getCurrencyData", () => {
         it("should return currency data for a pair of currencies", async () => {

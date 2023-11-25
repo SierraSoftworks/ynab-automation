@@ -3,6 +3,7 @@ import {AlphaVantage} from "./alphavantage"
 
 describe.skip("AlphaVantage Stock API", () => {
     const alphaVantage = new AlphaVantage(process.env.ALPHAVANTAGE_API_KEY)
+    alphaVantage.disableCache()
 
     describe("getCurrencyData", () => {
         it("should return currency data for a pair of currencies", async () => {
