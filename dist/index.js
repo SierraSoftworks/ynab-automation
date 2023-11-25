@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const ynab = require("ynab");
 const core = require("@actions/core");
+const cache = require("@actions/cache");
 const automation_1 = require("./automation");
 const parsers_1 = require("./parsers");
 const approve_1 = require("./automations/approve");
@@ -20,9 +21,13 @@ const stocks_1 = require("./automations/stocks");
 const yahoo_1 = require("./datasources/yahoo");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const cacheEnabled = core.getBooleanInput("cache", { required: false });
         try {
             const apiKey = core.getInput("api_key", { trimWhitespace: true, required: true });
             const api = new ynab.API(apiKey);
+            if (cacheEnabled) {
+                yield cache.restoreCache([".ynab-cache"], "ynab-cache");
+            }
             const yahoo = new yahoo_1.Yahoo();
             const automations = (0, automation_1.buildAutomationMap)([
                 new approve_1.ApproverAutomation(api),
@@ -60,6 +65,11 @@ function run() {
             core.debug(err.message);
             core.debug(err.stack);
             core.setFailed(err.message);
+        }
+        finally {
+            if (cacheEnabled) {
+                yield cache.saveCache([".ynab-cache"], "ynab-cache");
+            }
         }
     });
 }
