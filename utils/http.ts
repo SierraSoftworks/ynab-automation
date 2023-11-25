@@ -2,25 +2,32 @@ export function buildUrl(template: string, params: { [key: string]: string }): s
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''))
 }
 
-export async function fetchSafe<T>(url: string, options: RequestInit = {}, attempts: number = 3): Promise<T> {
+export async function retry<T>(action: () => Promise<T>, attempts: number = 3, delay: number = 500): Promise<T> {
     while (true) {
         attempts -= 1
 
-        const response = await fetch(url, {
-            ...options
-        })
-        
-        if (response.ok) {
-            return await response.json()
+        try {
+            return await action()
+        } catch (e) {
+            if (!attempts) {
+                throw e
+            }
         }
 
-        if (!attempts) {
+        await new Promise<null>((resolve) => {
+            setTimeout(() => resolve(null), delay)
+        })
+    }
+}
+
+export async function fetchSafe<T>(url: string, options: RequestInit = {}, attempts: number = 3): Promise<T> {
+    return await retry(async () => {
+        const response = await fetch(url, options)
+
+        if (!response.ok) {
             throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
         }
 
-        // Delay for 1s between retries
-        await new Promise<null>((resolve) => {
-            setTimeout(() => resolve(null), 500)
-        })
-    }
+        return await response.json()
+    }, attempts)
 }

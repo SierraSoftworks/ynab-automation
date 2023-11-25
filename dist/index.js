@@ -89772,26 +89772,44 @@ class Yahoo extends datasource_1.DataSource {
     }
     getStockDataInternal(symbol) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureSessionCrumb();
-            const url = (0, http_1.buildUrl)(stockUrl, { SYMBOL: symbol, crumb: this.crumb });
-            const response = yield (0, http_1.fetchSafe)(url, {
-                headers: Object.assign({}, this.headers, {
-                    "Cookie": this.cookie
-                })
-            });
-            return response.quoteSummary.result[0].price;
+            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
+                yield this.ensureSessionCrumb();
+                const url = (0, http_1.buildUrl)(stockUrl, { SYMBOL: symbol, crumb: this.crumb });
+                const response = yield fetch(url, {
+                    headers: Object.assign({}, this.headers, {
+                        "Cookie": this.cookie
+                    })
+                });
+                if (response.status >= 400) {
+                    // Ensure that we re-initialize these values on the next attempt
+                    this.cookie = this.crumb = null;
+                }
+                if (!response.ok)
+                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+                const result = yield response.json();
+                return result.quoteSummary.result[0].price;
+            }));
         });
     }
     getCurrencyDataInternal(from, to) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureSessionCrumb();
-            const url = (0, http_1.buildUrl)(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb });
-            const response = yield (0, http_1.fetchSafe)(url, {
-                headers: Object.assign({}, this.headers, {
-                    "Cookie": this.cookie
-                })
-            });
-            return response.quoteSummary.result[0].price;
+            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
+                yield this.ensureSessionCrumb();
+                const url = (0, http_1.buildUrl)(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb });
+                const response = yield fetch(url, {
+                    headers: Object.assign({}, this.headers, {
+                        "Cookie": this.cookie
+                    })
+                });
+                if (response.status >= 400) {
+                    // Ensure that we re-initialize these values on the next attempt
+                    this.cookie = this.crumb = null;
+                }
+                if (!response.ok)
+                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+                const result = yield response.json();
+                return result.quoteSummary.result[0].price;
+            }));
         });
     }
     ensureSessionCrumb() {
@@ -89808,25 +89826,34 @@ class Yahoo extends datasource_1.DataSource {
     }
     getSessionCookie() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch("https://fc.yahoo.com", {
-                headers: this.headers,
-                redirect: "follow"
-            });
-            return response.headers.get("set-cookie").split(";")[0] || "";
+            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
+                const resp = yield fetch("https://fc.yahoo.com", {
+                    headers: this.headers,
+                    redirect: "follow"
+                });
+                const cookie = resp.headers.get("set-cookie").split(";")[0] || "";
+                if (!cookie)
+                    throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`);
+                return cookie;
+            }));
         });
     }
     getSessionCrumb(sessionCookie) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-                headers: Object.assign({}, this.headers, {
-                    "Cookie": sessionCookie
-                }),
-                redirect: "follow"
-            });
-            const crumb = response.text();
-            if ((yield crumb).includes("<html>"))
-                return null;
-            return crumb;
+            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
+                const response = yield fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
+                    headers: Object.assign({}, this.headers, {
+                        "Cookie": sessionCookie
+                    }),
+                    redirect: "follow"
+                });
+                if (!response.ok)
+                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+                const crumb = response.text();
+                if ((yield crumb).includes("<html>"))
+                    throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`);
+                return crumb;
+            }));
         });
     }
 }
@@ -90002,27 +90029,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fetchSafe = exports.buildUrl = void 0;
+exports.fetchSafe = exports.retry = exports.buildUrl = void 0;
 function buildUrl(template, params) {
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''));
 }
 exports.buildUrl = buildUrl;
-function fetchSafe(url, options = {}, attempts = 3) {
+function retry(action, attempts = 3, delay = 500) {
     return __awaiter(this, void 0, void 0, function* () {
         while (true) {
             attempts -= 1;
-            const response = yield fetch(url, Object.assign({}, options));
-            if (response.ok) {
-                return yield response.json();
+            try {
+                return yield action();
             }
-            if (!attempts) {
-                throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+            catch (e) {
+                if (!attempts) {
+                    throw e;
+                }
             }
-            // Delay for 1s between retries
             yield new Promise((resolve) => {
-                setTimeout(() => resolve(null), 500);
+                setTimeout(() => resolve(null), delay);
             });
         }
+    });
+}
+exports.retry = retry;
+function fetchSafe(url, options = {}, attempts = 3) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield retry(() => __awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+            }
+            return yield response.json();
+        }), attempts);
     });
 }
 exports.fetchSafe = fetchSafe;

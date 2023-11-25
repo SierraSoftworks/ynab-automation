@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto"
-import {buildUrl, fetchSafe} from "../utils/http"
+import {buildUrl, fetchSafe, retry} from "../utils/http"
 import {CurrencyDataSource, DataSource, StockDataSource} from "./datasource"
 
 const validUserAgents = [
@@ -51,29 +51,49 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
     }
 
     private async getStockDataInternal(symbol: string): Promise<StockData> {
-        await this.ensureSessionCrumb()
+        return await retry(async () => {
+            await this.ensureSessionCrumb()
 
-        const url = buildUrl(stockUrl, { SYMBOL: symbol, crumb: this.crumb })
-        const response: any = await fetchSafe(url, {
+            const url = buildUrl(stockUrl, { SYMBOL: symbol, crumb: this.crumb })
+            const response = await fetch(url, {
                 headers: Object.assign({}, this.headers, {
                     "Cookie": this.cookie
                 })
             })
-        
-        return response.quoteSummary.result[0].price
+
+            if (response.status >= 400) {
+                // Ensure that we re-initialize these values on the next attempt
+                this.cookie = this.crumb = null
+            }
+
+            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+
+            const result = await response.json()
+            return result.quoteSummary.result[0].price
+        })
     }
 
     private async getCurrencyDataInternal(from: string, to: string): Promise<CurrencyData> {
-        await this.ensureSessionCrumb()
+        return await retry(async () => {
+            await this.ensureSessionCrumb()
 
-        const url = buildUrl(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb  })
-        const response: any = await fetchSafe(url, {
-            headers: Object.assign({}, this.headers, {
-                "Cookie": this.cookie
+            const url = buildUrl(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb  })
+            const response = await fetch(url, {
+                headers: Object.assign({}, this.headers, {
+                    "Cookie": this.cookie
+                })
             })
+
+            if (response.status >= 400) {
+                // Ensure that we re-initialize these values on the next attempt
+                this.cookie = this.crumb = null
+            }
+
+            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+
+            const result = await response.json()
+            return result.quoteSummary.result[0].price
         })
-        
-        return response.quoteSummary.result[0].price
     }
 
     private async ensureSessionCrumb(): Promise<void> {
@@ -89,26 +109,34 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
     }
 
     private async getSessionCookie(): Promise<string> {
+        return await retry(async () => {
+            const resp = await fetch("https://fc.yahoo.com", {
+                headers: this.headers,
+                redirect: "follow"
+            })
 
-        const response = await fetch("https://fc.yahoo.com", {
-            headers: this.headers,
-            redirect: "follow"
+            const cookie = resp.headers.get("set-cookie").split(";")[0] || ""
+            if (!cookie) throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`)
+
+            return cookie
         })
-
-        return response.headers.get("set-cookie").split(";")[0] || ""
     }
 
     private async getSessionCrumb(sessionCookie: string): Promise<string> {
-        const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-            headers: Object.assign({}, this.headers, {
-                "Cookie": sessionCookie
-            }),
-            redirect: "follow"
-        })
+        return await retry(async () => {
+            const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
+                headers: Object.assign({}, this.headers, {
+                    "Cookie": sessionCookie
+                }),
+                redirect: "follow"
+            })
 
-        const crumb = response.text()
-        if ((await crumb).includes("<html>")) return null
-        return crumb    
+            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+
+            const crumb = response.text()
+            if ((await crumb).includes("<html>")) throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`)
+            return crumb    
+        })
     }
 }
 
