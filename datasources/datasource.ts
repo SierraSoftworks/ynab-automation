@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto"
 import * as fs from "node:fs"
 import * as path from "node:path"
+import * as dayjs from "dayjs"
 
 type CacheExpiryTime = "hour" | "day" | "month" | "year" | "never"
 
@@ -14,6 +15,27 @@ export class DataSource {
 
     disableCache() {
         this.cacheEnabled = false
+    }
+
+    public async cleanCache() {
+        const now = dayjs().unix()
+
+        const cacheFiles = await fs.promises.readdir(this.cacheDirectory)
+        const expiredFiles = cacheFiles.filter(f => !f.startsWith("forever-")).filter(f => {
+            try
+            {
+                const expiry = parseInt(f.split("-")[0])
+                return expiry < now
+            }
+            catch
+            {
+                return false
+            }
+        })
+
+        await Promise.all(expiredFiles.map(async f => {
+            await fs.promises.rm(path.join(this.cacheDirectory, f))
+        }))
     }
 
     protected async cached<T>(key: string, expiry: CacheExpiryTime, hydrate: () => Promise<T>): Promise<T> {
@@ -34,15 +56,13 @@ export class DataSource {
     }
 
     private getCachePath(key: string, expiry: CacheExpiryTime = "never"): string {
-        const cacheExpiry = {
-            "hour": `${new Date().toISOString().split('T')[0]}T${new Date().getUTCHours()}:00:00Z`,
-            "day": `${new Date().toISOString().split('T')[0]}T00:00:00Z`,
-            "month": `${new Date().toISOString().split('T')[0].substring(0, 7)}-01T00:00:00Z`,
-            "year": `${new Date().toISOString().split('T')[0].substring(0, 4)}-01-01T00:00:00Z`,
-            "never": "0000-01-01T00:00:00Z"
-        }[expiry]
+        if (expiry === "never") {
+            return path.join(this.cacheDirectory, `forever-${key}`)
+        }
 
-        return path.join(this.cacheDirectory, createHash("sha256").update(cacheExpiry).update(key).digest("hex"))
+        const cacheExpiry = dayjs().add(1, expiry).unix()
+
+        return path.join(this.cacheDirectory, `${cacheExpiry}-${key}`)
     }
 }
 

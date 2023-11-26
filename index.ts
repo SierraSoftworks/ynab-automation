@@ -27,6 +27,11 @@ async function run() {
 
         const yahoo = new Yahoo()
 
+        if (cacheEnabled) {
+            core.debug("Removing old entries from the cache")
+            await yahoo.cleanCache()
+        }
+
         const automations = buildAutomationMap([
             new ApproverAutomation(api),
             new BottomlessAutomation(api),
