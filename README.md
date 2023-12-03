@@ -73,7 +73,7 @@ reduce the chances of you being rate limited.
 ## Configuration
 You control the automations which are enabled on your account(s) by adding specific
 commands to the notes on those accounts. These commands always take the form of
-`/automate:<command> <argument>=<value>,<argument>=<value>`.
+`/automate:<command> <argument>=<value> <argument>="<value>"`.
 
 ### Stock Account
 To enable the stock account automation, add a note to your stock account with the
@@ -81,7 +81,7 @@ following content:
 
 ```
 # Specify your list of stock tickers and the number of shares held for each ticker.
-/automate:stock MSFT=100, AAPL=100, GOOG=100
+/automate:stock MSFT=100 AAPL=100 GOOG=100
 ```
 
 *Note: You can change the list of stock tickers and the number of shares held for each ticker.*
