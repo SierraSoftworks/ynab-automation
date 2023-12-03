@@ -10,6 +10,7 @@ import { BottomlessAutomation } from "./automations/bottomless"
 import { ReplicateAutomation } from "./automations/replicate"
 import { StockAutomation } from "./automations/stocks"
 import { Yahoo } from "./datasources/yahoo";
+import { DataSource } from "./datasources/datasource";
 
 
 async function run() {
@@ -20,16 +21,23 @@ async function run() {
         const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true })
         const api = new ynab.API(apiKey)
 
-
         if (cacheEnabled) {
-            await cache.restoreCache([".ynab-cache"], "ynab-cache")
+            await cache.restoreCache([DataSource.cacheDirectory], "ynab-cache")
         }
-
+        
         const yahoo = new Yahoo()
 
         if (cacheEnabled) {
             core.debug("Removing old entries from the cache")
-            await yahoo.cleanCache()
+
+            try
+            {
+                await yahoo.cleanCache()
+            }
+            catch (err)
+            {
+                core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)", err)
+            }
         }
 
         const automations = buildAutomationMap([
@@ -73,7 +81,7 @@ async function run() {
         core.setFailed(err.message)
     } finally {
         if (cacheEnabled) {
-            await cache.saveCache([".ynab-cache"], "ynab-cache")
+            await cache.saveCache([DataSource.cacheDirectory], "ynab-cache")
         }
     }
 }

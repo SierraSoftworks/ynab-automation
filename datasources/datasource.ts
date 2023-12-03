@@ -7,8 +7,10 @@ type CacheExpiryTime = "hour" | "day" | "month" | "year" | "never"
 
 export class DataSource {
     constructor(protected id: string) {
-        this.cacheDirectory = path.join(process.cwd(), ".ynab-cache", id)
+        this.cacheDirectory = path.join(DataSource.cacheDirectory, id)
     }
+
+    static readonly cacheDirectory: string = ".ynab-cache"
 
     private cacheDirectory: string
     private cacheEnabled = true
@@ -19,6 +21,11 @@ export class DataSource {
 
     public async cleanCache() {
         const now = dayjs().unix()
+
+        if (!(await fs.promises.stat(this.cacheDirectory)).isDirectory()) {
+            // If we can't hope to clean the cache, don't bother with the rest of this
+            return
+        }
 
         const cacheFiles = await fs.promises.readdir(this.cacheDirectory)
         const expiredFiles = cacheFiles.filter(f => !f.startsWith("forever-")).filter(f => {
