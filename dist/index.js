@@ -89688,7 +89688,7 @@ class DataSource {
     constructor(id) {
         this.id = id;
         this.cacheEnabled = true;
-        this.cacheDirectory = path.join(process.cwd(), ".ynab-cache", id);
+        this.cacheDirectory = path.join(DataSource.cacheDirectory, id);
     }
     disableCache() {
         this.cacheEnabled = false;
@@ -89696,6 +89696,10 @@ class DataSource {
     cleanCache() {
         return __awaiter(this, void 0, void 0, function* () {
             const now = dayjs().unix();
+            if (!(yield fs.promises.stat(this.cacheDirectory)).isDirectory()) {
+                // If we can't hope to clean the cache, don't bother with the rest of this
+                return;
+            }
             const cacheFiles = yield fs.promises.readdir(this.cacheDirectory);
             const expiredFiles = cacheFiles.filter(f => !f.startsWith("forever-")).filter(f => {
                 try {
@@ -89735,6 +89739,7 @@ class DataSource {
     }
 }
 exports.DataSource = DataSource;
+DataSource.cacheDirectory = ".ynab-cache";
 
 
 /***/ }),
@@ -89911,6 +89916,7 @@ const bottomless_1 = __nccwpck_require__(9383);
 const replicate_1 = __nccwpck_require__(7435);
 const stocks_1 = __nccwpck_require__(8263);
 const yahoo_1 = __nccwpck_require__(6074);
+const datasource_1 = __nccwpck_require__(5046);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const cacheEnabled = core.getBooleanInput("cache", { required: false });
@@ -89918,12 +89924,17 @@ function run() {
             const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true });
             const api = new ynab.API(apiKey);
             if (cacheEnabled) {
-                yield cache.restoreCache([".ynab-cache"], "ynab-cache");
+                yield cache.restoreCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
             }
             const yahoo = new yahoo_1.Yahoo();
             if (cacheEnabled) {
                 core.debug("Removing old entries from the cache");
-                yield yahoo.cleanCache();
+                try {
+                    yield yahoo.cleanCache();
+                }
+                catch (err) {
+                    core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)", err);
+                }
             }
             const automations = (0, automation_1.buildAutomationMap)([
                 new approve_1.ApproverAutomation(api),
@@ -89964,7 +89975,7 @@ function run() {
         }
         finally {
             if (cacheEnabled) {
-                yield cache.saveCache([".ynab-cache"], "ynab-cache");
+                yield cache.saveCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
             }
         }
     });
