@@ -95,7 +95,7 @@ Fortunately, this automation allows you to automatically replicate transactions 
 budget to another by adding a note to your account with the following content:
 
 ```
-automate:replicate to_budget=Household to_account=Alice from_category=Groceries to_category=Food cleared=yes to_flag=blue
+/automate:replicate to_budget=Household to_account=Alice from_category=Groceries to_category=Food cleared=yes to_flag=blue
 ```
 
 ### Automated Approvals
