@@ -90071,8 +90071,8 @@ function buildUrl(template, params) {
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''));
 }
 exports.buildUrl = buildUrl;
-function retry(action, attempts = 3, delay = 500) {
-    return __awaiter(this, void 0, void 0, function* () {
+function retry(action_1) {
+    return __awaiter(this, arguments, void 0, function* (action, attempts = 3, delay = 500) {
         while (true) {
             attempts -= 1;
             try {
@@ -90090,8 +90090,8 @@ function retry(action, attempts = 3, delay = 500) {
     });
 }
 exports.retry = retry;
-function fetchSafe(url, options = {}, attempts = 3) {
-    return __awaiter(this, void 0, void 0, function* () {
+function fetchSafe(url_1) {
+    return __awaiter(this, arguments, void 0, function* (url, options = {}, attempts = 3) {
         return yield retry(() => __awaiter(this, void 0, void 0, function* () {
             const response = yield fetch(url, options);
             if (!response.ok) {
