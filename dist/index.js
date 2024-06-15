@@ -74150,7 +74150,7 @@ class StockAutomation extends automation_1.Automation {
     }
     getCurrencyValue(value, targetCurrency) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(:?\.\d+)?)$/);
+            const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(?:\.\d+)?)$/);
             const amount = parseFloat(amountSpec);
             if (!currencySpec)
                 return amount;

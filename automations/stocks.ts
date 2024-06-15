@@ -61,7 +61,7 @@ export class StockAutomation extends Automation {
     }
 
     protected async getCurrencyValue(value: string, targetCurrency: string): Promise<number> {
-        const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(:?\.\d+)?)$/)
+        const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(?:\.\d+)?)$/)
         const amount = parseFloat(amountSpec)
 
         if (!currencySpec) return amount
