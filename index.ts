@@ -36,7 +36,8 @@ async function run() {
             }
             catch (err)
             {
-                core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)", err)
+                core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)")
+                core.warning(err)
             }
         }
 
@@ -68,7 +69,8 @@ async function run() {
                     await automation.run(budget.data.budget, account, trigger.options)
                     core.info(`Finished running automation '${automation.kind}' in account '${account.name}'`)
                 } catch (err) {
-                    core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`, err)
+                    core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`)
+                    core.error(err)
                     throw err
                 }
             }))
@@ -78,7 +80,7 @@ async function run() {
     } catch (err) {
         core.debug(err.message)
         core.debug(err.stack)
-        core.setFailed(err.message)
+        core.setFailed(err)
     } finally {
         if (cacheEnabled) {
             await cache.saveCache([DataSource.cacheDirectory], "ynab-cache")

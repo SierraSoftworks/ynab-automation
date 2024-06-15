@@ -74485,7 +74485,8 @@ function run() {
                     yield yahoo.cleanCache();
                 }
                 catch (err) {
-                    core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)", err);
+                    core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)");
+                    core.warning(err);
                 }
             }
             const automations = (0, automation_1.buildAutomationMap)([
@@ -74513,7 +74514,8 @@ function run() {
                         core.info(`Finished running automation '${automation.kind}' in account '${account.name}'`);
                     }
                     catch (err) {
-                        core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`, err);
+                        core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`);
+                        core.error(err);
                         throw err;
                     }
                 })));
@@ -74523,7 +74525,7 @@ function run() {
         catch (err) {
             core.debug(err.message);
             core.debug(err.stack);
-            core.setFailed(err.message);
+            core.setFailed(err);
         }
         finally {
             if (cacheEnabled) {
