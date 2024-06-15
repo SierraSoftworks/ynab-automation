@@ -49,7 +49,7 @@ export class StockAutomation extends Automation {
 
     public static getNetValue(stockValues: StockValue[], options: { cgtRate?: number; costBasis?: number }): number {
         const gross = stockValues.reduce((sum, stock) => sum + stock.value, 0);
-        const cgt = (gross - options.costBasis || 0) * options.cgtRate || 0;
+        const cgt = Math.max((gross - options.costBasis || 0) * options.cgtRate || 0, 0);
         return gross - cgt;
     }
 

@@ -74139,7 +74139,7 @@ class StockAutomation extends automation_1.Automation {
     }
     static getNetValue(stockValues, options) {
         const gross = stockValues.reduce((sum, stock) => sum + stock.value, 0);
-        const cgt = (gross - options.costBasis || 0) * options.cgtRate || 0;
+        const cgt = Math.max((gross - options.costBasis || 0) * options.cgtRate || 0, 0);
         return gross - cgt;
     }
     getStocks(options) {
