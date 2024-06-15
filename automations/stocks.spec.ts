@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { StockChecker } from "./stocks";
+import { StockAutomation, StockChecker } from "./stocks";
 import { CurrencyDataSource, StockDataSource } from "../datasources/datasource";
 
 describe("stocks", () => {
@@ -23,6 +23,44 @@ describe("stocks", () => {
     }
 
     const stockChecker = new StockChecker(new MockDataSource(), new MockDataSource());
+
+    describe("calculating the net value of an account", () => {
+        it("should return the gross value when no CGT config is provided", () => {
+            assert.equal(StockAutomation.getNetValue([
+                { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
+            ], {
+
+            }), 100)
+        })
+
+        it("should return the the correct net value when accounting for CGT", () => {
+            assert.equal(StockAutomation.getNetValue([
+                { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
+            ], {
+                cgt_rate: "40",
+                cost_basis: "50"
+            }), 80)
+        })
+
+        it("should return the the correct net value when accounting for CGT when the rate is specified with a percent sign", () => {
+            assert.equal(StockAutomation.getNetValue([
+                { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
+            ], {
+                cgt_rate: "40%",
+                cost_basis: "50"
+            }), 80)
+        })
+
+        it("should return the the correct net value when accounting for CGT if multiple tickers are present", () => {
+            assert.equal(StockAutomation.getNetValue([
+                { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
+                { symbol: "GOOG", price: 20, value: 200, nativePrice: 10, nativeCurrency: "USD", nativeValue: 100 }
+            ], {
+                cgt_rate: "40",
+                cost_basis: "150"
+            }), 240)
+        })
+    })
 
     describe.skip("fetching ticker data", () => {
         it("should fetch ticker data", async () => {

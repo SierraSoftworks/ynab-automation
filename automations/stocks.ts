@@ -22,7 +22,8 @@ export class StockAutomation extends Automation {
         const values = await this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code)
         if (!values.length) return;
 
-        const shift = Math.floor(values.reduce((sum, stock) => sum + stock.value, 0) * 1000) - account.balance;
+        const net = StockAutomation.getNetValue(values, options) * 1000;
+        const shift = net - account.balance;
 
         // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
         if (Math.abs(shift) <= 1000) return;
@@ -40,10 +41,18 @@ export class StockAutomation extends Automation {
         })
     }
 
+    public static getNetValue(stockValues: StockValue[], options: { cgt_rate?: string; cost_basis?: string }): number {
+        const gross = stockValues.reduce((sum, stock) => sum + stock.value, 0);
+        const costBasis = parseFloat(options.cost_basis || "0");
+        const cgtRate = parseFloat(options.cgt_rate?.replace('%', '')?.trim() || "0") / 100;
+        const cgt = (gross - costBasis) * cgtRate;
+        return gross - cgt;
+    }
+
     private getStocks(options: { [key: string]: string }): StockHolding[] {
-        return Object.keys(options).filter(k => k !== "payee_name").map(symbol => ({
+        return Object.keys(options).filter(k => k !== "payee_name" && k !== "cost_basis" && k !== "cgt_rate").map(symbol => ({
             symbol,
-            quantity: parseFloat(options[symbol])
+            quantity: parseFloat(options[symbol]),
         }))
     }
 }
@@ -51,14 +60,26 @@ export class StockAutomation extends Automation {
 interface StockHolding {
     symbol: string
     quantity: number
+    costBasis?: number
 }
 
 interface StockValue {
+    // The stock symbol
     symbol: string
+
+    // The value of the shares held in the target currency
     value: number
+
+    // The currency that the stock is valued in
     nativeCurrency: string
+
+    // The value of the shares held in the native currency
     nativeValue: number
+
+    // The price of the stock in the target currency
     price: number
+
+    // The price of the stock in its native currency
     nativePrice: number
 }
 
