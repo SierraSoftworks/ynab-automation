@@ -4,7 +4,7 @@ import { StockDataSource, CurrencyDataSource } from "../datasources/datasource"
 import { Account, API, BudgetDetail, SaveTransaction, TransactionClearedStatus } from "ynab"
 
 export class StockAutomation extends Automation {
-    constructor(api: API, stocks: StockDataSource, currencies: CurrencyDataSource) {
+    constructor(api: API, stocks: StockDataSource, private readonly currencies: CurrencyDataSource) {
         super(api)
 
         this.stockChecker = new StockChecker(stocks, currencies)
@@ -22,7 +22,13 @@ export class StockAutomation extends Automation {
         const values = await this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code)
         if (!values.length) return;
 
-        const net = StockAutomation.getNetValue(values, options) * 1000;
+        const costBasis = await this.getCurrencyValue(options.cost_basis || "0", budget.currency_format.iso_code);
+        const cgtRate = parseFloat(options.cgt_rate?.replace('%', '')?.trim() || "0") / 100;
+
+        const net = StockAutomation.getNetValue(values, {
+            costBasis,
+            cgtRate
+        }) * 1000;
         const shift = net - account.balance;
 
         // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
@@ -41,19 +47,27 @@ export class StockAutomation extends Automation {
         })
     }
 
-    public static getNetValue(stockValues: StockValue[], options: { cgt_rate?: string; cost_basis?: string }): number {
+    public static getNetValue(stockValues: StockValue[], options: { cgtRate?: number; costBasis?: number }): number {
         const gross = stockValues.reduce((sum, stock) => sum + stock.value, 0);
-        const costBasis = parseFloat(options.cost_basis || "0");
-        const cgtRate = parseFloat(options.cgt_rate?.replace('%', '')?.trim() || "0") / 100;
-        const cgt = (gross - costBasis) * cgtRate;
+        const cgt = (gross - options.costBasis || 0) * options.cgtRate || 0;
         return gross - cgt;
     }
 
-    private getStocks(options: { [key: string]: string }): StockHolding[] {
+    protected getStocks(options: { [key: string]: string }): StockHolding[] {
         return Object.keys(options).filter(k => k !== "payee_name" && k !== "cost_basis" && k !== "cgt_rate").map(symbol => ({
             symbol,
             quantity: parseFloat(options[symbol]),
         }))
+    }
+
+    protected async getCurrencyValue(value: string, targetCurrency: string): Promise<number> {
+        const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(:?\.\d+)?)$/)
+        const amount = parseFloat(amountSpec)
+
+        if (!currencySpec) return amount
+
+        const currencyRate = await this.currencies.getCurrencyData(currencySpec, targetCurrency)
+        return amount * currencyRate
     }
 }
 

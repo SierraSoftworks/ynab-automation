@@ -81,10 +81,13 @@ following content:
 
 ```
 # Specify your list of stock tickers and the number of shares held for each ticker.
-/automate:stock MSFT=100 AAPL=100 GOOG=100
+/automate:stock MSFT=100 AAPL=100 GOOG=100 cost_basis=USD5000 cgt_rate=40%
 ```
 
 *Note: You can change the list of stock tickers and the number of shares held for each ticker.*
+
+You control the calculation of a Capital Gains Tax deduction by specifying the cost basis
+for your stock holdings and the Capital Gains Tax rate you expect to pay.
 
 ### Cross-Budget Replication
 If you're using multiple YNAB budgets to provide a shared household budget while retaining

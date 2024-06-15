@@ -74101,6 +74101,7 @@ const ynab_1 = __nccwpck_require__(187);
 class StockAutomation extends automation_1.Automation {
     constructor(api, stocks, currencies) {
         super(api);
+        this.currencies = currencies;
         this.stockChecker = new StockChecker(stocks, currencies);
     }
     get kind() {
@@ -74108,11 +74109,18 @@ class StockAutomation extends automation_1.Automation {
     }
     run(budget, account, options) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             const holdings = this.getStocks(options);
             const values = yield this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code);
             if (!values.length)
                 return;
-            const shift = Math.floor(values.reduce((sum, stock) => sum + stock.value, 0) * 1000) - account.balance;
+            const costBasis = yield this.getCurrencyValue(options.cost_basis || "0", budget.currency_format.iso_code);
+            const cgtRate = parseFloat(((_b = (_a = options.cgt_rate) === null || _a === void 0 ? void 0 : _a.replace('%', '')) === null || _b === void 0 ? void 0 : _b.trim()) || "0") / 100;
+            const net = StockAutomation.getNetValue(values, {
+                costBasis,
+                cgtRate
+            }) * 1000;
+            const shift = net - account.balance;
             // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
             if (Math.abs(shift) <= 1000)
                 return;
@@ -74129,11 +74137,26 @@ class StockAutomation extends automation_1.Automation {
             });
         });
     }
+    static getNetValue(stockValues, options) {
+        const gross = stockValues.reduce((sum, stock) => sum + stock.value, 0);
+        const cgt = (gross - options.costBasis || 0) * options.cgtRate || 0;
+        return gross - cgt;
+    }
     getStocks(options) {
-        return Object.keys(options).filter(k => k !== "payee_name").map(symbol => ({
+        return Object.keys(options).filter(k => k !== "payee_name" && k !== "cost_basis" && k !== "cgt_rate").map(symbol => ({
             symbol,
-            quantity: parseFloat(options[symbol])
+            quantity: parseFloat(options[symbol]),
         }));
+    }
+    getCurrencyValue(value, targetCurrency) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(:?\.\d+)?)$/);
+            const amount = parseFloat(amountSpec);
+            if (!currencySpec)
+                return amount;
+            const currencyRate = yield this.currencies.getCurrencyData(currencySpec, targetCurrency);
+            return amount * currencyRate;
+        });
     }
 }
 exports.StockAutomation = StockAutomation;

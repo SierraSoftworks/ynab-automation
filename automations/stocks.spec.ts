@@ -37,8 +37,8 @@ describe("stocks", () => {
             assert.equal(StockAutomation.getNetValue([
                 { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
             ], {
-                cgt_rate: "40",
-                cost_basis: "50"
+                cgtRate: 0.4,
+                costBasis: 50
             }), 80)
         })
 
@@ -46,8 +46,8 @@ describe("stocks", () => {
             assert.equal(StockAutomation.getNetValue([
                 { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
             ], {
-                cgt_rate: "40%",
-                cost_basis: "50"
+                cgtRate: 0.4,
+                costBasis: 50
             }), 80)
         })
 
@@ -56,8 +56,8 @@ describe("stocks", () => {
                 { symbol: "AAPL", price: 10, value: 100, nativePrice: 5, nativeCurrency: "USD", nativeValue: 50 },
                 { symbol: "GOOG", price: 20, value: 200, nativePrice: 10, nativeCurrency: "USD", nativeValue: 100 }
             ], {
-                cgt_rate: "40",
-                cost_basis: "150"
+                cgtRate: 0.4,
+                costBasis: 150
             }), 240)
         })
     })
