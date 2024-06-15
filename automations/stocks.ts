@@ -29,7 +29,7 @@ export class StockAutomation extends Automation {
             costBasis,
             cgtRate
         }) * 1000;
-        const shift = net - account.balance;
+        const shift = Math.floor(net - account.balance);
 
         // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
         if (Math.abs(shift) <= 1000) return;
