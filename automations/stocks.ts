@@ -1,7 +1,7 @@
 import { Automation } from "../automation"
 import { StockDataSource, CurrencyDataSource } from "../datasources/datasource"
 
-import { Account, API, BudgetDetail, SaveTransaction, TransactionClearedStatus } from "ynab"
+import { Account, API, BudgetDetail, TransactionClearedStatus } from "ynab"
 
 export class StockAutomation extends Automation {
     constructor(api: API, stocks: StockDataSource, private readonly currencies: CurrencyDataSource) {
