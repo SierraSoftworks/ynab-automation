@@ -22,7 +22,7 @@
   "dependencies": {
     "@actions/cache": "3.2.4",
     "@actions/core": "^1.10.1",
-    "dayjs": "^1.11.11",
+    "dayjs": "^1.11.12",
     "ynab": "^2.4.0"
   },
   "devDependencies": {
