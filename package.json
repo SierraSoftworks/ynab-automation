@@ -20,7 +20,7 @@
     "test": "ts-mocha '**/*.spec.ts'"
   },
   "dependencies": {
-    "@actions/cache": "4.0.1",
+    "@actions/cache": "4.0.2",
     "@actions/core": "^1.11.1",
     "dayjs": "^1.11.13",
     "ynab": "^2.6.0"
