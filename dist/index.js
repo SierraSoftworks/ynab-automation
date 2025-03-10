@@ -71979,7 +71979,7 @@ const index_1 = __nccwpck_require__(1424);
  */
 class ScheduledTransactionsApi extends runtime.BaseAPI {
     /**
-     * Creates a single scheduled transaction.
+     * Creates a single scheduled transaction (a transaction with a future date).
      * Create a single scheduled transaction
      */
     async createScheduledTransactionRaw(requestParameters, initOverrides) {
@@ -72010,11 +72010,48 @@ class ScheduledTransactionsApi extends runtime.BaseAPI {
         return new runtime.JSONApiResponse(response, (jsonValue) => (0, index_1.ScheduledTransactionResponseFromJSON)(jsonValue));
     }
     /**
-     * Creates a single scheduled transaction.
+     * Creates a single scheduled transaction (a transaction with a future date).
      * Create a single scheduled transaction
      */
     async createScheduledTransaction(budgetId, data, initOverrides) {
         const response = await this.createScheduledTransactionRaw({ budgetId: budgetId, data: data }, initOverrides);
+        return await response.value();
+    }
+    /**
+     * Deletes a scheduled transaction
+     * Deletes an existing scheduled transaction
+     */
+    async deleteScheduledTransactionRaw(requestParameters, initOverrides) {
+        if (requestParameters.budgetId === null || requestParameters.budgetId === undefined) {
+            throw new runtime.RequiredError('budgetId', 'Required parameter requestParameters.budgetId was null or undefined when calling deleteScheduledTransaction.');
+        }
+        if (requestParameters.scheduledTransactionId === null || requestParameters.scheduledTransactionId === undefined) {
+            throw new runtime.RequiredError('scheduledTransactionId', 'Required parameter requestParameters.scheduledTransactionId was null or undefined when calling deleteScheduledTransaction.');
+        }
+        const queryParameters = {};
+        const headerParameters = {};
+        headerParameters['Accept'] = 'application/json';
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/budgets/{budget_id}/scheduled_transactions`.replace(`{${"budget_id"}}`, encodeURIComponent(String(requestParameters.budgetId))).replace(`{${"scheduled_transaction_id"}}`, encodeURIComponent(String(requestParameters.scheduledTransactionId))),
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+        return new runtime.JSONApiResponse(response, (jsonValue) => (0, index_1.ScheduledTransactionResponseFromJSON)(jsonValue));
+    }
+    /**
+     * Deletes a scheduled transaction
+     * Deletes an existing scheduled transaction
+     */
+    async deleteScheduledTransaction(budgetId, scheduledTransactionId, initOverrides) {
+        const response = await this.deleteScheduledTransactionRaw({ budgetId: budgetId, scheduledTransactionId: scheduledTransactionId }, initOverrides);
         return await response.value();
     }
     /**
@@ -72089,6 +72126,48 @@ class ScheduledTransactionsApi extends runtime.BaseAPI {
      */
     async getScheduledTransactions(budgetId, lastKnowledgeOfServer, initOverrides) {
         const response = await this.getScheduledTransactionsRaw({ budgetId: budgetId, lastKnowledgeOfServer: lastKnowledgeOfServer }, initOverrides);
+        return await response.value();
+    }
+    /**
+     * Updates a single scheduled transaction
+     * Updates an existing scheduled transaction
+     */
+    async updateScheduledTransactionRaw(requestParameters, initOverrides) {
+        if (requestParameters.budgetId === null || requestParameters.budgetId === undefined) {
+            throw new runtime.RequiredError('budgetId', 'Required parameter requestParameters.budgetId was null or undefined when calling updateScheduledTransaction.');
+        }
+        if (requestParameters.scheduledTransactionId === null || requestParameters.scheduledTransactionId === undefined) {
+            throw new runtime.RequiredError('scheduledTransactionId', 'Required parameter requestParameters.scheduledTransactionId was null or undefined when calling updateScheduledTransaction.');
+        }
+        if (requestParameters.putScheduledTransactionWrapper === null || requestParameters.putScheduledTransactionWrapper === undefined) {
+            throw new runtime.RequiredError('putScheduledTransactionWrapper', 'Required parameter requestParameters.putScheduledTransactionWrapper was null or undefined when calling updateScheduledTransaction.');
+        }
+        const queryParameters = {};
+        const headerParameters = {};
+        headerParameters['Accept'] = 'application/json';
+        headerParameters['Content-Type'] = 'application/json';
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearer", []);
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/budgets/{budget_id}/scheduled_transactions`.replace(`{${"budget_id"}}`, encodeURIComponent(String(requestParameters.budgetId))).replace(`{${"scheduled_transaction_id"}}`, encodeURIComponent(String(requestParameters.scheduledTransactionId))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: (0, index_1.PutScheduledTransactionWrapperToJSON)(requestParameters.putScheduledTransactionWrapper),
+        }, initOverrides);
+        return new runtime.JSONApiResponse(response, (jsonValue) => (0, index_1.ScheduledTransactionResponseFromJSON)(jsonValue));
+    }
+    /**
+     * Updates a single scheduled transaction
+     * Updates an existing scheduled transaction
+     */
+    async updateScheduledTransaction(budgetId, scheduledTransactionId, putScheduledTransactionWrapper, initOverrides) {
+        const response = await this.updateScheduledTransactionRaw({ budgetId: budgetId, scheduledTransactionId: scheduledTransactionId, putScheduledTransactionWrapper: putScheduledTransactionWrapper }, initOverrides);
         return await response.value();
     }
 }
@@ -72913,7 +72992,7 @@ exports.API = api;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountToJSON = exports.AccountFromJSONTyped = exports.AccountFromJSON = exports.instanceOfAccount = void 0;
+exports.AccountToJSONTyped = exports.AccountToJSON = exports.AccountFromJSONTyped = exports.AccountFromJSON = exports.instanceOfAccount = void 0;
 const AccountType_1 = __nccwpck_require__(5283);
 /**
  * Check if a given object implements the Account interface.
@@ -72972,7 +73051,11 @@ function AccountFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.AccountFromJSONTyped = AccountFromJSONTyped;
-function AccountToJSON(value) {
+function AccountToJSON(json) {
+    return AccountToJSONTyped(json, false);
+}
+exports.AccountToJSON = AccountToJSON;
+function AccountToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -72997,7 +73080,7 @@ function AccountToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.AccountToJSON = AccountToJSON;
+exports.AccountToJSONTyped = AccountToJSONTyped;
 
 
 /***/ }),
@@ -73016,7 +73099,7 @@ exports.AccountToJSON = AccountToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountResponseToJSON = exports.AccountResponseFromJSONTyped = exports.AccountResponseFromJSON = exports.instanceOfAccountResponse = void 0;
+exports.AccountResponseToJSONTyped = exports.AccountResponseToJSON = exports.AccountResponseFromJSONTyped = exports.AccountResponseFromJSON = exports.instanceOfAccountResponse = void 0;
 const AccountResponseData_1 = __nccwpck_require__(9376);
 /**
  * Check if a given object implements the AccountResponse interface.
@@ -73040,7 +73123,11 @@ function AccountResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.AccountResponseFromJSONTyped = AccountResponseFromJSONTyped;
-function AccountResponseToJSON(value) {
+function AccountResponseToJSON(json) {
+    return AccountResponseToJSONTyped(json, false);
+}
+exports.AccountResponseToJSON = AccountResponseToJSON;
+function AccountResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73048,7 +73135,7 @@ function AccountResponseToJSON(value) {
         'data': (0, AccountResponseData_1.AccountResponseDataToJSON)(value['data']),
     };
 }
-exports.AccountResponseToJSON = AccountResponseToJSON;
+exports.AccountResponseToJSONTyped = AccountResponseToJSONTyped;
 
 
 /***/ }),
@@ -73067,7 +73154,7 @@ exports.AccountResponseToJSON = AccountResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountResponseDataToJSON = exports.AccountResponseDataFromJSONTyped = exports.AccountResponseDataFromJSON = exports.instanceOfAccountResponseData = void 0;
+exports.AccountResponseDataToJSONTyped = exports.AccountResponseDataToJSON = exports.AccountResponseDataFromJSONTyped = exports.AccountResponseDataFromJSON = exports.instanceOfAccountResponseData = void 0;
 const Account_1 = __nccwpck_require__(4811);
 /**
  * Check if a given object implements the AccountResponseData interface.
@@ -73091,7 +73178,11 @@ function AccountResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.AccountResponseDataFromJSONTyped = AccountResponseDataFromJSONTyped;
-function AccountResponseDataToJSON(value) {
+function AccountResponseDataToJSON(json) {
+    return AccountResponseDataToJSONTyped(json, false);
+}
+exports.AccountResponseDataToJSON = AccountResponseDataToJSON;
+function AccountResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73099,7 +73190,7 @@ function AccountResponseDataToJSON(value) {
         'account': (0, Account_1.AccountToJSON)(value['account']),
     };
 }
-exports.AccountResponseDataToJSON = AccountResponseDataToJSON;
+exports.AccountResponseDataToJSONTyped = AccountResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73118,7 +73209,7 @@ exports.AccountResponseDataToJSON = AccountResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountTypeToJSON = exports.AccountTypeFromJSONTyped = exports.AccountTypeFromJSON = exports.instanceOfAccountType = exports.AccountType = void 0;
+exports.AccountTypeToJSONTyped = exports.AccountTypeToJSON = exports.AccountTypeFromJSONTyped = exports.AccountTypeFromJSON = exports.instanceOfAccountType = exports.AccountType = void 0;
 /**
  * The type of account
  * @export
@@ -73161,6 +73252,10 @@ function AccountTypeToJSON(value) {
     return value;
 }
 exports.AccountTypeToJSON = AccountTypeToJSON;
+function AccountTypeToJSONTyped(value, ignoreDiscriminator) {
+    return value;
+}
+exports.AccountTypeToJSONTyped = AccountTypeToJSONTyped;
 
 
 /***/ }),
@@ -73179,7 +73274,7 @@ exports.AccountTypeToJSON = AccountTypeToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountsResponseToJSON = exports.AccountsResponseFromJSONTyped = exports.AccountsResponseFromJSON = exports.instanceOfAccountsResponse = void 0;
+exports.AccountsResponseToJSONTyped = exports.AccountsResponseToJSON = exports.AccountsResponseFromJSONTyped = exports.AccountsResponseFromJSON = exports.instanceOfAccountsResponse = void 0;
 const AccountsResponseData_1 = __nccwpck_require__(8161);
 /**
  * Check if a given object implements the AccountsResponse interface.
@@ -73203,7 +73298,11 @@ function AccountsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.AccountsResponseFromJSONTyped = AccountsResponseFromJSONTyped;
-function AccountsResponseToJSON(value) {
+function AccountsResponseToJSON(json) {
+    return AccountsResponseToJSONTyped(json, false);
+}
+exports.AccountsResponseToJSON = AccountsResponseToJSON;
+function AccountsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73211,7 +73310,7 @@ function AccountsResponseToJSON(value) {
         'data': (0, AccountsResponseData_1.AccountsResponseDataToJSON)(value['data']),
     };
 }
-exports.AccountsResponseToJSON = AccountsResponseToJSON;
+exports.AccountsResponseToJSONTyped = AccountsResponseToJSONTyped;
 
 
 /***/ }),
@@ -73230,7 +73329,7 @@ exports.AccountsResponseToJSON = AccountsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountsResponseDataToJSON = exports.AccountsResponseDataFromJSONTyped = exports.AccountsResponseDataFromJSON = exports.instanceOfAccountsResponseData = void 0;
+exports.AccountsResponseDataToJSONTyped = exports.AccountsResponseDataToJSON = exports.AccountsResponseDataFromJSONTyped = exports.AccountsResponseDataFromJSON = exports.instanceOfAccountsResponseData = void 0;
 const Account_1 = __nccwpck_require__(4811);
 /**
  * Check if a given object implements the AccountsResponseData interface.
@@ -73257,7 +73356,11 @@ function AccountsResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.AccountsResponseDataFromJSONTyped = AccountsResponseDataFromJSONTyped;
-function AccountsResponseDataToJSON(value) {
+function AccountsResponseDataToJSON(json) {
+    return AccountsResponseDataToJSONTyped(json, false);
+}
+exports.AccountsResponseDataToJSON = AccountsResponseDataToJSON;
+function AccountsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73266,7 +73369,7 @@ function AccountsResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.AccountsResponseDataToJSON = AccountsResponseDataToJSON;
+exports.AccountsResponseDataToJSONTyped = AccountsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73285,7 +73388,7 @@ exports.AccountsResponseDataToJSON = AccountsResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetDetailToJSON = exports.BudgetDetailFromJSONTyped = exports.BudgetDetailFromJSON = exports.instanceOfBudgetDetail = void 0;
+exports.BudgetDetailToJSONTyped = exports.BudgetDetailToJSON = exports.BudgetDetailFromJSONTyped = exports.BudgetDetailFromJSON = exports.instanceOfBudgetDetail = void 0;
 const PayeeLocation_1 = __nccwpck_require__(1387);
 const Account_1 = __nccwpck_require__(4811);
 const ScheduledTransactionSummary_1 = __nccwpck_require__(1439);
@@ -73338,7 +73441,11 @@ function BudgetDetailFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetDetailFromJSONTyped = BudgetDetailFromJSONTyped;
-function BudgetDetailToJSON(value) {
+function BudgetDetailToJSON(json) {
+    return BudgetDetailToJSONTyped(json, false);
+}
+exports.BudgetDetailToJSON = BudgetDetailToJSON;
+function BudgetDetailToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73362,7 +73469,7 @@ function BudgetDetailToJSON(value) {
         'scheduled_subtransactions': value['scheduled_subtransactions'] == null ? undefined : (value['scheduled_subtransactions'].map(ScheduledSubTransaction_1.ScheduledSubTransactionToJSON)),
     };
 }
-exports.BudgetDetailToJSON = BudgetDetailToJSON;
+exports.BudgetDetailToJSONTyped = BudgetDetailToJSONTyped;
 
 
 /***/ }),
@@ -73381,7 +73488,7 @@ exports.BudgetDetailToJSON = BudgetDetailToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetDetailResponseToJSON = exports.BudgetDetailResponseFromJSONTyped = exports.BudgetDetailResponseFromJSON = exports.instanceOfBudgetDetailResponse = void 0;
+exports.BudgetDetailResponseToJSONTyped = exports.BudgetDetailResponseToJSON = exports.BudgetDetailResponseFromJSONTyped = exports.BudgetDetailResponseFromJSON = exports.instanceOfBudgetDetailResponse = void 0;
 const BudgetDetailResponseData_1 = __nccwpck_require__(1293);
 /**
  * Check if a given object implements the BudgetDetailResponse interface.
@@ -73405,7 +73512,11 @@ function BudgetDetailResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetDetailResponseFromJSONTyped = BudgetDetailResponseFromJSONTyped;
-function BudgetDetailResponseToJSON(value) {
+function BudgetDetailResponseToJSON(json) {
+    return BudgetDetailResponseToJSONTyped(json, false);
+}
+exports.BudgetDetailResponseToJSON = BudgetDetailResponseToJSON;
+function BudgetDetailResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73413,7 +73524,7 @@ function BudgetDetailResponseToJSON(value) {
         'data': (0, BudgetDetailResponseData_1.BudgetDetailResponseDataToJSON)(value['data']),
     };
 }
-exports.BudgetDetailResponseToJSON = BudgetDetailResponseToJSON;
+exports.BudgetDetailResponseToJSONTyped = BudgetDetailResponseToJSONTyped;
 
 
 /***/ }),
@@ -73432,7 +73543,7 @@ exports.BudgetDetailResponseToJSON = BudgetDetailResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetDetailResponseDataToJSON = exports.BudgetDetailResponseDataFromJSONTyped = exports.BudgetDetailResponseDataFromJSON = exports.instanceOfBudgetDetailResponseData = void 0;
+exports.BudgetDetailResponseDataToJSONTyped = exports.BudgetDetailResponseDataToJSON = exports.BudgetDetailResponseDataFromJSONTyped = exports.BudgetDetailResponseDataFromJSON = exports.instanceOfBudgetDetailResponseData = void 0;
 const BudgetDetail_1 = __nccwpck_require__(1146);
 /**
  * Check if a given object implements the BudgetDetailResponseData interface.
@@ -73459,7 +73570,11 @@ function BudgetDetailResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetDetailResponseDataFromJSONTyped = BudgetDetailResponseDataFromJSONTyped;
-function BudgetDetailResponseDataToJSON(value) {
+function BudgetDetailResponseDataToJSON(json) {
+    return BudgetDetailResponseDataToJSONTyped(json, false);
+}
+exports.BudgetDetailResponseDataToJSON = BudgetDetailResponseDataToJSON;
+function BudgetDetailResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73468,7 +73583,7 @@ function BudgetDetailResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.BudgetDetailResponseDataToJSON = BudgetDetailResponseDataToJSON;
+exports.BudgetDetailResponseDataToJSONTyped = BudgetDetailResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73487,7 +73602,7 @@ exports.BudgetDetailResponseDataToJSON = BudgetDetailResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSettingsToJSON = exports.BudgetSettingsFromJSONTyped = exports.BudgetSettingsFromJSON = exports.instanceOfBudgetSettings = void 0;
+exports.BudgetSettingsToJSONTyped = exports.BudgetSettingsToJSON = exports.BudgetSettingsFromJSONTyped = exports.BudgetSettingsFromJSON = exports.instanceOfBudgetSettings = void 0;
 const CurrencyFormat_1 = __nccwpck_require__(8078);
 const DateFormat_1 = __nccwpck_require__(569);
 /**
@@ -73515,7 +73630,11 @@ function BudgetSettingsFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSettingsFromJSONTyped = BudgetSettingsFromJSONTyped;
-function BudgetSettingsToJSON(value) {
+function BudgetSettingsToJSON(json) {
+    return BudgetSettingsToJSONTyped(json, false);
+}
+exports.BudgetSettingsToJSON = BudgetSettingsToJSON;
+function BudgetSettingsToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73524,7 +73643,7 @@ function BudgetSettingsToJSON(value) {
         'currency_format': (0, CurrencyFormat_1.CurrencyFormatToJSON)(value['currency_format']),
     };
 }
-exports.BudgetSettingsToJSON = BudgetSettingsToJSON;
+exports.BudgetSettingsToJSONTyped = BudgetSettingsToJSONTyped;
 
 
 /***/ }),
@@ -73543,7 +73662,7 @@ exports.BudgetSettingsToJSON = BudgetSettingsToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSettingsResponseToJSON = exports.BudgetSettingsResponseFromJSONTyped = exports.BudgetSettingsResponseFromJSON = exports.instanceOfBudgetSettingsResponse = void 0;
+exports.BudgetSettingsResponseToJSONTyped = exports.BudgetSettingsResponseToJSON = exports.BudgetSettingsResponseFromJSONTyped = exports.BudgetSettingsResponseFromJSON = exports.instanceOfBudgetSettingsResponse = void 0;
 const BudgetSettingsResponseData_1 = __nccwpck_require__(6409);
 /**
  * Check if a given object implements the BudgetSettingsResponse interface.
@@ -73567,7 +73686,11 @@ function BudgetSettingsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSettingsResponseFromJSONTyped = BudgetSettingsResponseFromJSONTyped;
-function BudgetSettingsResponseToJSON(value) {
+function BudgetSettingsResponseToJSON(json) {
+    return BudgetSettingsResponseToJSONTyped(json, false);
+}
+exports.BudgetSettingsResponseToJSON = BudgetSettingsResponseToJSON;
+function BudgetSettingsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73575,7 +73698,7 @@ function BudgetSettingsResponseToJSON(value) {
         'data': (0, BudgetSettingsResponseData_1.BudgetSettingsResponseDataToJSON)(value['data']),
     };
 }
-exports.BudgetSettingsResponseToJSON = BudgetSettingsResponseToJSON;
+exports.BudgetSettingsResponseToJSONTyped = BudgetSettingsResponseToJSONTyped;
 
 
 /***/ }),
@@ -73594,7 +73717,7 @@ exports.BudgetSettingsResponseToJSON = BudgetSettingsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSettingsResponseDataToJSON = exports.BudgetSettingsResponseDataFromJSONTyped = exports.BudgetSettingsResponseDataFromJSON = exports.instanceOfBudgetSettingsResponseData = void 0;
+exports.BudgetSettingsResponseDataToJSONTyped = exports.BudgetSettingsResponseDataToJSON = exports.BudgetSettingsResponseDataFromJSONTyped = exports.BudgetSettingsResponseDataFromJSON = exports.instanceOfBudgetSettingsResponseData = void 0;
 const BudgetSettings_1 = __nccwpck_require__(5190);
 /**
  * Check if a given object implements the BudgetSettingsResponseData interface.
@@ -73618,7 +73741,11 @@ function BudgetSettingsResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSettingsResponseDataFromJSONTyped = BudgetSettingsResponseDataFromJSONTyped;
-function BudgetSettingsResponseDataToJSON(value) {
+function BudgetSettingsResponseDataToJSON(json) {
+    return BudgetSettingsResponseDataToJSONTyped(json, false);
+}
+exports.BudgetSettingsResponseDataToJSON = BudgetSettingsResponseDataToJSON;
+function BudgetSettingsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73626,7 +73753,7 @@ function BudgetSettingsResponseDataToJSON(value) {
         'settings': (0, BudgetSettings_1.BudgetSettingsToJSON)(value['settings']),
     };
 }
-exports.BudgetSettingsResponseDataToJSON = BudgetSettingsResponseDataToJSON;
+exports.BudgetSettingsResponseDataToJSONTyped = BudgetSettingsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73645,7 +73772,7 @@ exports.BudgetSettingsResponseDataToJSON = BudgetSettingsResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSummaryToJSON = exports.BudgetSummaryFromJSONTyped = exports.BudgetSummaryFromJSON = exports.instanceOfBudgetSummary = void 0;
+exports.BudgetSummaryToJSONTyped = exports.BudgetSummaryToJSON = exports.BudgetSummaryFromJSONTyped = exports.BudgetSummaryFromJSON = exports.instanceOfBudgetSummary = void 0;
 const Account_1 = __nccwpck_require__(4811);
 const CurrencyFormat_1 = __nccwpck_require__(8078);
 const DateFormat_1 = __nccwpck_require__(569);
@@ -73680,7 +73807,11 @@ function BudgetSummaryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSummaryFromJSONTyped = BudgetSummaryFromJSONTyped;
-function BudgetSummaryToJSON(value) {
+function BudgetSummaryToJSON(json) {
+    return BudgetSummaryToJSONTyped(json, false);
+}
+exports.BudgetSummaryToJSON = BudgetSummaryToJSON;
+function BudgetSummaryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73695,7 +73826,7 @@ function BudgetSummaryToJSON(value) {
         'accounts': value['accounts'] == null ? undefined : (value['accounts'].map(Account_1.AccountToJSON)),
     };
 }
-exports.BudgetSummaryToJSON = BudgetSummaryToJSON;
+exports.BudgetSummaryToJSONTyped = BudgetSummaryToJSONTyped;
 
 
 /***/ }),
@@ -73714,7 +73845,7 @@ exports.BudgetSummaryToJSON = BudgetSummaryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSummaryResponseToJSON = exports.BudgetSummaryResponseFromJSONTyped = exports.BudgetSummaryResponseFromJSON = exports.instanceOfBudgetSummaryResponse = void 0;
+exports.BudgetSummaryResponseToJSONTyped = exports.BudgetSummaryResponseToJSON = exports.BudgetSummaryResponseFromJSONTyped = exports.BudgetSummaryResponseFromJSON = exports.instanceOfBudgetSummaryResponse = void 0;
 const BudgetSummaryResponseData_1 = __nccwpck_require__(3900);
 /**
  * Check if a given object implements the BudgetSummaryResponse interface.
@@ -73738,7 +73869,11 @@ function BudgetSummaryResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSummaryResponseFromJSONTyped = BudgetSummaryResponseFromJSONTyped;
-function BudgetSummaryResponseToJSON(value) {
+function BudgetSummaryResponseToJSON(json) {
+    return BudgetSummaryResponseToJSONTyped(json, false);
+}
+exports.BudgetSummaryResponseToJSON = BudgetSummaryResponseToJSON;
+function BudgetSummaryResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73746,7 +73881,7 @@ function BudgetSummaryResponseToJSON(value) {
         'data': (0, BudgetSummaryResponseData_1.BudgetSummaryResponseDataToJSON)(value['data']),
     };
 }
-exports.BudgetSummaryResponseToJSON = BudgetSummaryResponseToJSON;
+exports.BudgetSummaryResponseToJSONTyped = BudgetSummaryResponseToJSONTyped;
 
 
 /***/ }),
@@ -73765,7 +73900,7 @@ exports.BudgetSummaryResponseToJSON = BudgetSummaryResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BudgetSummaryResponseDataToJSON = exports.BudgetSummaryResponseDataFromJSONTyped = exports.BudgetSummaryResponseDataFromJSON = exports.instanceOfBudgetSummaryResponseData = void 0;
+exports.BudgetSummaryResponseDataToJSONTyped = exports.BudgetSummaryResponseDataToJSON = exports.BudgetSummaryResponseDataFromJSONTyped = exports.BudgetSummaryResponseDataFromJSON = exports.instanceOfBudgetSummaryResponseData = void 0;
 const BudgetSummary_1 = __nccwpck_require__(551);
 /**
  * Check if a given object implements the BudgetSummaryResponseData interface.
@@ -73790,7 +73925,11 @@ function BudgetSummaryResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BudgetSummaryResponseDataFromJSONTyped = BudgetSummaryResponseDataFromJSONTyped;
-function BudgetSummaryResponseDataToJSON(value) {
+function BudgetSummaryResponseDataToJSON(json) {
+    return BudgetSummaryResponseDataToJSONTyped(json, false);
+}
+exports.BudgetSummaryResponseDataToJSON = BudgetSummaryResponseDataToJSON;
+function BudgetSummaryResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73799,7 +73938,7 @@ function BudgetSummaryResponseDataToJSON(value) {
         'default_budget': (0, BudgetSummary_1.BudgetSummaryToJSON)(value['default_budget']),
     };
 }
-exports.BudgetSummaryResponseDataToJSON = BudgetSummaryResponseDataToJSON;
+exports.BudgetSummaryResponseDataToJSONTyped = BudgetSummaryResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73818,7 +73957,7 @@ exports.BudgetSummaryResponseDataToJSON = BudgetSummaryResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BulkResponseToJSON = exports.BulkResponseFromJSONTyped = exports.BulkResponseFromJSON = exports.instanceOfBulkResponse = void 0;
+exports.BulkResponseToJSONTyped = exports.BulkResponseToJSON = exports.BulkResponseFromJSONTyped = exports.BulkResponseFromJSON = exports.instanceOfBulkResponse = void 0;
 const BulkResponseData_1 = __nccwpck_require__(6993);
 /**
  * Check if a given object implements the BulkResponse interface.
@@ -73842,7 +73981,11 @@ function BulkResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BulkResponseFromJSONTyped = BulkResponseFromJSONTyped;
-function BulkResponseToJSON(value) {
+function BulkResponseToJSON(json) {
+    return BulkResponseToJSONTyped(json, false);
+}
+exports.BulkResponseToJSON = BulkResponseToJSON;
+function BulkResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73850,7 +73993,7 @@ function BulkResponseToJSON(value) {
         'data': (0, BulkResponseData_1.BulkResponseDataToJSON)(value['data']),
     };
 }
-exports.BulkResponseToJSON = BulkResponseToJSON;
+exports.BulkResponseToJSONTyped = BulkResponseToJSONTyped;
 
 
 /***/ }),
@@ -73869,7 +74012,7 @@ exports.BulkResponseToJSON = BulkResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BulkResponseDataToJSON = exports.BulkResponseDataFromJSONTyped = exports.BulkResponseDataFromJSON = exports.instanceOfBulkResponseData = void 0;
+exports.BulkResponseDataToJSONTyped = exports.BulkResponseDataToJSON = exports.BulkResponseDataFromJSONTyped = exports.BulkResponseDataFromJSON = exports.instanceOfBulkResponseData = void 0;
 const BulkResponseDataBulk_1 = __nccwpck_require__(1213);
 /**
  * Check if a given object implements the BulkResponseData interface.
@@ -73893,7 +74036,11 @@ function BulkResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BulkResponseDataFromJSONTyped = BulkResponseDataFromJSONTyped;
-function BulkResponseDataToJSON(value) {
+function BulkResponseDataToJSON(json) {
+    return BulkResponseDataToJSONTyped(json, false);
+}
+exports.BulkResponseDataToJSON = BulkResponseDataToJSON;
+function BulkResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73901,7 +74048,7 @@ function BulkResponseDataToJSON(value) {
         'bulk': (0, BulkResponseDataBulk_1.BulkResponseDataBulkToJSON)(value['bulk']),
     };
 }
-exports.BulkResponseDataToJSON = BulkResponseDataToJSON;
+exports.BulkResponseDataToJSONTyped = BulkResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -73920,7 +74067,7 @@ exports.BulkResponseDataToJSON = BulkResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BulkResponseDataBulkToJSON = exports.BulkResponseDataBulkFromJSONTyped = exports.BulkResponseDataBulkFromJSON = exports.instanceOfBulkResponseDataBulk = void 0;
+exports.BulkResponseDataBulkToJSONTyped = exports.BulkResponseDataBulkToJSON = exports.BulkResponseDataBulkFromJSONTyped = exports.BulkResponseDataBulkFromJSON = exports.instanceOfBulkResponseDataBulk = void 0;
 /**
  * Check if a given object implements the BulkResponseDataBulk interface.
  */
@@ -73946,7 +74093,11 @@ function BulkResponseDataBulkFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BulkResponseDataBulkFromJSONTyped = BulkResponseDataBulkFromJSONTyped;
-function BulkResponseDataBulkToJSON(value) {
+function BulkResponseDataBulkToJSON(json) {
+    return BulkResponseDataBulkToJSONTyped(json, false);
+}
+exports.BulkResponseDataBulkToJSON = BulkResponseDataBulkToJSON;
+function BulkResponseDataBulkToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -73955,7 +74106,7 @@ function BulkResponseDataBulkToJSON(value) {
         'duplicate_import_ids': value['duplicate_import_ids'],
     };
 }
-exports.BulkResponseDataBulkToJSON = BulkResponseDataBulkToJSON;
+exports.BulkResponseDataBulkToJSONTyped = BulkResponseDataBulkToJSONTyped;
 
 
 /***/ }),
@@ -73974,7 +74125,7 @@ exports.BulkResponseDataBulkToJSON = BulkResponseDataBulkToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BulkTransactionsToJSON = exports.BulkTransactionsFromJSONTyped = exports.BulkTransactionsFromJSON = exports.instanceOfBulkTransactions = void 0;
+exports.BulkTransactionsToJSONTyped = exports.BulkTransactionsToJSON = exports.BulkTransactionsFromJSONTyped = exports.BulkTransactionsFromJSON = exports.instanceOfBulkTransactions = void 0;
 const SaveTransactionWithOptionalFields_1 = __nccwpck_require__(8738);
 /**
  * Check if a given object implements the BulkTransactions interface.
@@ -73998,7 +74149,11 @@ function BulkTransactionsFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.BulkTransactionsFromJSONTyped = BulkTransactionsFromJSONTyped;
-function BulkTransactionsToJSON(value) {
+function BulkTransactionsToJSON(json) {
+    return BulkTransactionsToJSONTyped(json, false);
+}
+exports.BulkTransactionsToJSON = BulkTransactionsToJSON;
+function BulkTransactionsToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74006,7 +74161,7 @@ function BulkTransactionsToJSON(value) {
         'transactions': (value['transactions'].map(SaveTransactionWithOptionalFields_1.SaveTransactionWithOptionalFieldsToJSON)),
     };
 }
-exports.BulkTransactionsToJSON = BulkTransactionsToJSON;
+exports.BulkTransactionsToJSONTyped = BulkTransactionsToJSONTyped;
 
 
 /***/ }),
@@ -74025,7 +74180,7 @@ exports.BulkTransactionsToJSON = BulkTransactionsToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoriesResponseToJSON = exports.CategoriesResponseFromJSONTyped = exports.CategoriesResponseFromJSON = exports.instanceOfCategoriesResponse = void 0;
+exports.CategoriesResponseToJSONTyped = exports.CategoriesResponseToJSON = exports.CategoriesResponseFromJSONTyped = exports.CategoriesResponseFromJSON = exports.instanceOfCategoriesResponse = void 0;
 const CategoriesResponseData_1 = __nccwpck_require__(3129);
 /**
  * Check if a given object implements the CategoriesResponse interface.
@@ -74049,7 +74204,11 @@ function CategoriesResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoriesResponseFromJSONTyped = CategoriesResponseFromJSONTyped;
-function CategoriesResponseToJSON(value) {
+function CategoriesResponseToJSON(json) {
+    return CategoriesResponseToJSONTyped(json, false);
+}
+exports.CategoriesResponseToJSON = CategoriesResponseToJSON;
+function CategoriesResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74057,7 +74216,7 @@ function CategoriesResponseToJSON(value) {
         'data': (0, CategoriesResponseData_1.CategoriesResponseDataToJSON)(value['data']),
     };
 }
-exports.CategoriesResponseToJSON = CategoriesResponseToJSON;
+exports.CategoriesResponseToJSONTyped = CategoriesResponseToJSONTyped;
 
 
 /***/ }),
@@ -74076,7 +74235,7 @@ exports.CategoriesResponseToJSON = CategoriesResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoriesResponseDataToJSON = exports.CategoriesResponseDataFromJSONTyped = exports.CategoriesResponseDataFromJSON = exports.instanceOfCategoriesResponseData = void 0;
+exports.CategoriesResponseDataToJSONTyped = exports.CategoriesResponseDataToJSON = exports.CategoriesResponseDataFromJSONTyped = exports.CategoriesResponseDataFromJSON = exports.instanceOfCategoriesResponseData = void 0;
 const CategoryGroupWithCategories_1 = __nccwpck_require__(1915);
 /**
  * Check if a given object implements the CategoriesResponseData interface.
@@ -74103,7 +74262,11 @@ function CategoriesResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoriesResponseDataFromJSONTyped = CategoriesResponseDataFromJSONTyped;
-function CategoriesResponseDataToJSON(value) {
+function CategoriesResponseDataToJSON(json) {
+    return CategoriesResponseDataToJSONTyped(json, false);
+}
+exports.CategoriesResponseDataToJSON = CategoriesResponseDataToJSON;
+function CategoriesResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74112,7 +74275,7 @@ function CategoriesResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.CategoriesResponseDataToJSON = CategoriesResponseDataToJSON;
+exports.CategoriesResponseDataToJSONTyped = CategoriesResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -74131,7 +74294,7 @@ exports.CategoriesResponseDataToJSON = CategoriesResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoryToJSON = exports.CategoryFromJSONTyped = exports.CategoryFromJSON = exports.instanceOfCategory = exports.CategoryGoalTypeEnum = void 0;
+exports.CategoryToJSONTyped = exports.CategoryToJSON = exports.CategoryFromJSONTyped = exports.CategoryFromJSON = exports.instanceOfCategory = exports.CategoryGoalTypeEnum = void 0;
 /**
  * @export
  */
@@ -74140,7 +74303,7 @@ exports.CategoryGoalTypeEnum = {
     Tbd: 'TBD',
     Mf: 'MF',
     Need: 'NEED',
-    Debt: 'DEBT',
+    Debt: 'DEBT'
 };
 /**
  * Check if a given object implements the Category interface.
@@ -74201,7 +74364,11 @@ function CategoryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoryFromJSONTyped = CategoryFromJSONTyped;
-function CategoryToJSON(value) {
+function CategoryToJSON(json) {
+    return CategoryToJSONTyped(json, false);
+}
+exports.CategoryToJSON = CategoryToJSON;
+function CategoryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74232,7 +74399,7 @@ function CategoryToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.CategoryToJSON = CategoryToJSON;
+exports.CategoryToJSONTyped = CategoryToJSONTyped;
 
 
 /***/ }),
@@ -74251,7 +74418,7 @@ exports.CategoryToJSON = CategoryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoryGroupToJSON = exports.CategoryGroupFromJSONTyped = exports.CategoryGroupFromJSON = exports.instanceOfCategoryGroup = void 0;
+exports.CategoryGroupToJSONTyped = exports.CategoryGroupToJSON = exports.CategoryGroupFromJSONTyped = exports.CategoryGroupFromJSON = exports.instanceOfCategoryGroup = void 0;
 /**
  * Check if a given object implements the CategoryGroup interface.
  */
@@ -74283,7 +74450,11 @@ function CategoryGroupFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoryGroupFromJSONTyped = CategoryGroupFromJSONTyped;
-function CategoryGroupToJSON(value) {
+function CategoryGroupToJSON(json) {
+    return CategoryGroupToJSONTyped(json, false);
+}
+exports.CategoryGroupToJSON = CategoryGroupToJSON;
+function CategoryGroupToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74294,7 +74465,7 @@ function CategoryGroupToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.CategoryGroupToJSON = CategoryGroupToJSON;
+exports.CategoryGroupToJSONTyped = CategoryGroupToJSONTyped;
 
 
 /***/ }),
@@ -74313,7 +74484,7 @@ exports.CategoryGroupToJSON = CategoryGroupToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoryGroupWithCategoriesToJSON = exports.CategoryGroupWithCategoriesFromJSONTyped = exports.CategoryGroupWithCategoriesFromJSON = exports.instanceOfCategoryGroupWithCategories = void 0;
+exports.CategoryGroupWithCategoriesToJSONTyped = exports.CategoryGroupWithCategoriesToJSON = exports.CategoryGroupWithCategoriesFromJSONTyped = exports.CategoryGroupWithCategoriesFromJSON = exports.instanceOfCategoryGroupWithCategories = void 0;
 const Category_1 = __nccwpck_require__(3466);
 /**
  * Check if a given object implements the CategoryGroupWithCategories interface.
@@ -74349,7 +74520,11 @@ function CategoryGroupWithCategoriesFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoryGroupWithCategoriesFromJSONTyped = CategoryGroupWithCategoriesFromJSONTyped;
-function CategoryGroupWithCategoriesToJSON(value) {
+function CategoryGroupWithCategoriesToJSON(json) {
+    return CategoryGroupWithCategoriesToJSONTyped(json, false);
+}
+exports.CategoryGroupWithCategoriesToJSON = CategoryGroupWithCategoriesToJSON;
+function CategoryGroupWithCategoriesToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74361,7 +74536,7 @@ function CategoryGroupWithCategoriesToJSON(value) {
         'categories': (value['categories'].map(Category_1.CategoryToJSON)),
     };
 }
-exports.CategoryGroupWithCategoriesToJSON = CategoryGroupWithCategoriesToJSON;
+exports.CategoryGroupWithCategoriesToJSONTyped = CategoryGroupWithCategoriesToJSONTyped;
 
 
 /***/ }),
@@ -74380,7 +74555,7 @@ exports.CategoryGroupWithCategoriesToJSON = CategoryGroupWithCategoriesToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoryResponseToJSON = exports.CategoryResponseFromJSONTyped = exports.CategoryResponseFromJSON = exports.instanceOfCategoryResponse = void 0;
+exports.CategoryResponseToJSONTyped = exports.CategoryResponseToJSON = exports.CategoryResponseFromJSONTyped = exports.CategoryResponseFromJSON = exports.instanceOfCategoryResponse = void 0;
 const CategoryResponseData_1 = __nccwpck_require__(8925);
 /**
  * Check if a given object implements the CategoryResponse interface.
@@ -74404,7 +74579,11 @@ function CategoryResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoryResponseFromJSONTyped = CategoryResponseFromJSONTyped;
-function CategoryResponseToJSON(value) {
+function CategoryResponseToJSON(json) {
+    return CategoryResponseToJSONTyped(json, false);
+}
+exports.CategoryResponseToJSON = CategoryResponseToJSON;
+function CategoryResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74412,7 +74591,7 @@ function CategoryResponseToJSON(value) {
         'data': (0, CategoryResponseData_1.CategoryResponseDataToJSON)(value['data']),
     };
 }
-exports.CategoryResponseToJSON = CategoryResponseToJSON;
+exports.CategoryResponseToJSONTyped = CategoryResponseToJSONTyped;
 
 
 /***/ }),
@@ -74431,7 +74610,7 @@ exports.CategoryResponseToJSON = CategoryResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CategoryResponseDataToJSON = exports.CategoryResponseDataFromJSONTyped = exports.CategoryResponseDataFromJSON = exports.instanceOfCategoryResponseData = void 0;
+exports.CategoryResponseDataToJSONTyped = exports.CategoryResponseDataToJSON = exports.CategoryResponseDataFromJSONTyped = exports.CategoryResponseDataFromJSON = exports.instanceOfCategoryResponseData = void 0;
 const Category_1 = __nccwpck_require__(3466);
 /**
  * Check if a given object implements the CategoryResponseData interface.
@@ -74455,7 +74634,11 @@ function CategoryResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CategoryResponseDataFromJSONTyped = CategoryResponseDataFromJSONTyped;
-function CategoryResponseDataToJSON(value) {
+function CategoryResponseDataToJSON(json) {
+    return CategoryResponseDataToJSONTyped(json, false);
+}
+exports.CategoryResponseDataToJSON = CategoryResponseDataToJSON;
+function CategoryResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74463,7 +74646,7 @@ function CategoryResponseDataToJSON(value) {
         'category': (0, Category_1.CategoryToJSON)(value['category']),
     };
 }
-exports.CategoryResponseDataToJSON = CategoryResponseDataToJSON;
+exports.CategoryResponseDataToJSONTyped = CategoryResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -74482,7 +74665,7 @@ exports.CategoryResponseDataToJSON = CategoryResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CurrencyFormatToJSON = exports.CurrencyFormatFromJSONTyped = exports.CurrencyFormatFromJSON = exports.instanceOfCurrencyFormat = void 0;
+exports.CurrencyFormatToJSONTyped = exports.CurrencyFormatToJSON = exports.CurrencyFormatFromJSONTyped = exports.CurrencyFormatFromJSON = exports.instanceOfCurrencyFormat = void 0;
 /**
  * Check if a given object implements the CurrencyFormat interface.
  */
@@ -74526,7 +74709,11 @@ function CurrencyFormatFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.CurrencyFormatFromJSONTyped = CurrencyFormatFromJSONTyped;
-function CurrencyFormatToJSON(value) {
+function CurrencyFormatToJSON(json) {
+    return CurrencyFormatToJSONTyped(json, false);
+}
+exports.CurrencyFormatToJSON = CurrencyFormatToJSON;
+function CurrencyFormatToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74541,7 +74728,7 @@ function CurrencyFormatToJSON(value) {
         'display_symbol': value['display_symbol'],
     };
 }
-exports.CurrencyFormatToJSON = CurrencyFormatToJSON;
+exports.CurrencyFormatToJSONTyped = CurrencyFormatToJSONTyped;
 
 
 /***/ }),
@@ -74560,7 +74747,7 @@ exports.CurrencyFormatToJSON = CurrencyFormatToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DateFormatToJSON = exports.DateFormatFromJSONTyped = exports.DateFormatFromJSON = exports.instanceOfDateFormat = void 0;
+exports.DateFormatToJSONTyped = exports.DateFormatToJSON = exports.DateFormatFromJSONTyped = exports.DateFormatFromJSON = exports.instanceOfDateFormat = void 0;
 /**
  * Check if a given object implements the DateFormat interface.
  */
@@ -74583,7 +74770,11 @@ function DateFormatFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.DateFormatFromJSONTyped = DateFormatFromJSONTyped;
-function DateFormatToJSON(value) {
+function DateFormatToJSON(json) {
+    return DateFormatToJSONTyped(json, false);
+}
+exports.DateFormatToJSON = DateFormatToJSON;
+function DateFormatToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74591,7 +74782,7 @@ function DateFormatToJSON(value) {
         'format': value['format'],
     };
 }
-exports.DateFormatToJSON = DateFormatToJSON;
+exports.DateFormatToJSONTyped = DateFormatToJSONTyped;
 
 
 /***/ }),
@@ -74610,7 +74801,7 @@ exports.DateFormatToJSON = DateFormatToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ErrorDetailToJSON = exports.ErrorDetailFromJSONTyped = exports.ErrorDetailFromJSON = exports.instanceOfErrorDetail = void 0;
+exports.ErrorDetailToJSONTyped = exports.ErrorDetailToJSON = exports.ErrorDetailFromJSONTyped = exports.ErrorDetailFromJSON = exports.instanceOfErrorDetail = void 0;
 /**
  * Check if a given object implements the ErrorDetail interface.
  */
@@ -74639,7 +74830,11 @@ function ErrorDetailFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ErrorDetailFromJSONTyped = ErrorDetailFromJSONTyped;
-function ErrorDetailToJSON(value) {
+function ErrorDetailToJSON(json) {
+    return ErrorDetailToJSONTyped(json, false);
+}
+exports.ErrorDetailToJSON = ErrorDetailToJSON;
+function ErrorDetailToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74649,7 +74844,7 @@ function ErrorDetailToJSON(value) {
         'detail': value['detail'],
     };
 }
-exports.ErrorDetailToJSON = ErrorDetailToJSON;
+exports.ErrorDetailToJSONTyped = ErrorDetailToJSONTyped;
 
 
 /***/ }),
@@ -74668,7 +74863,7 @@ exports.ErrorDetailToJSON = ErrorDetailToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ErrorResponseToJSON = exports.ErrorResponseFromJSONTyped = exports.ErrorResponseFromJSON = exports.instanceOfErrorResponse = void 0;
+exports.ErrorResponseToJSONTyped = exports.ErrorResponseToJSON = exports.ErrorResponseFromJSONTyped = exports.ErrorResponseFromJSON = exports.instanceOfErrorResponse = void 0;
 const ErrorDetail_1 = __nccwpck_require__(8935);
 /**
  * Check if a given object implements the ErrorResponse interface.
@@ -74692,7 +74887,11 @@ function ErrorResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ErrorResponseFromJSONTyped = ErrorResponseFromJSONTyped;
-function ErrorResponseToJSON(value) {
+function ErrorResponseToJSON(json) {
+    return ErrorResponseToJSONTyped(json, false);
+}
+exports.ErrorResponseToJSON = ErrorResponseToJSON;
+function ErrorResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74700,7 +74899,7 @@ function ErrorResponseToJSON(value) {
         'error': (0, ErrorDetail_1.ErrorDetailToJSON)(value['error']),
     };
 }
-exports.ErrorResponseToJSON = ErrorResponseToJSON;
+exports.ErrorResponseToJSONTyped = ErrorResponseToJSONTyped;
 
 
 /***/ }),
@@ -74719,7 +74918,7 @@ exports.ErrorResponseToJSON = ErrorResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ExistingTransactionToJSON = exports.ExistingTransactionFromJSONTyped = exports.ExistingTransactionFromJSON = exports.instanceOfExistingTransaction = void 0;
+exports.ExistingTransactionToJSONTyped = exports.ExistingTransactionToJSON = exports.ExistingTransactionFromJSONTyped = exports.ExistingTransactionFromJSON = exports.instanceOfExistingTransaction = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 const SaveSubTransaction_1 = __nccwpck_require__(4033);
@@ -74753,7 +74952,11 @@ function ExistingTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ExistingTransactionFromJSONTyped = ExistingTransactionFromJSONTyped;
-function ExistingTransactionToJSON(value) {
+function ExistingTransactionToJSON(json) {
+    return ExistingTransactionToJSONTyped(json, false);
+}
+exports.ExistingTransactionToJSON = ExistingTransactionToJSON;
+function ExistingTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74771,7 +74974,7 @@ function ExistingTransactionToJSON(value) {
         'subtransactions': value['subtransactions'] == null ? undefined : (value['subtransactions'].map(SaveSubTransaction_1.SaveSubTransactionToJSON)),
     };
 }
-exports.ExistingTransactionToJSON = ExistingTransactionToJSON;
+exports.ExistingTransactionToJSONTyped = ExistingTransactionToJSONTyped;
 
 
 /***/ }),
@@ -74790,7 +74993,7 @@ exports.ExistingTransactionToJSON = ExistingTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.HybridTransactionToJSON = exports.HybridTransactionFromJSONTyped = exports.HybridTransactionFromJSON = exports.instanceOfHybridTransaction = exports.HybridTransactionTypeEnum = exports.HybridTransactionDebtTransactionTypeEnum = void 0;
+exports.HybridTransactionToJSONTyped = exports.HybridTransactionToJSON = exports.HybridTransactionFromJSONTyped = exports.HybridTransactionFromJSON = exports.instanceOfHybridTransaction = exports.HybridTransactionTypeEnum = exports.HybridTransactionDebtTransactionTypeEnum = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 /**
@@ -74804,7 +75007,7 @@ exports.HybridTransactionDebtTransactionTypeEnum = {
     Escrow: 'escrow',
     BalanceAdjustment: 'balanceAdjustment',
     Credit: 'credit',
-    Charge: 'charge',
+    Charge: 'charge'
 };
 /**
  * @export
@@ -74874,7 +75077,11 @@ function HybridTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.HybridTransactionFromJSONTyped = HybridTransactionFromJSONTyped;
-function HybridTransactionToJSON(value) {
+function HybridTransactionToJSON(json) {
+    return HybridTransactionToJSONTyped(json, false);
+}
+exports.HybridTransactionToJSON = HybridTransactionToJSON;
+function HybridTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74905,7 +75112,7 @@ function HybridTransactionToJSON(value) {
         'category_name': value['category_name'],
     };
 }
-exports.HybridTransactionToJSON = HybridTransactionToJSON;
+exports.HybridTransactionToJSONTyped = HybridTransactionToJSONTyped;
 
 
 /***/ }),
@@ -74924,7 +75131,7 @@ exports.HybridTransactionToJSON = HybridTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.HybridTransactionsResponseToJSON = exports.HybridTransactionsResponseFromJSONTyped = exports.HybridTransactionsResponseFromJSON = exports.instanceOfHybridTransactionsResponse = void 0;
+exports.HybridTransactionsResponseToJSONTyped = exports.HybridTransactionsResponseToJSON = exports.HybridTransactionsResponseFromJSONTyped = exports.HybridTransactionsResponseFromJSON = exports.instanceOfHybridTransactionsResponse = void 0;
 const HybridTransactionsResponseData_1 = __nccwpck_require__(8374);
 /**
  * Check if a given object implements the HybridTransactionsResponse interface.
@@ -74948,7 +75155,11 @@ function HybridTransactionsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.HybridTransactionsResponseFromJSONTyped = HybridTransactionsResponseFromJSONTyped;
-function HybridTransactionsResponseToJSON(value) {
+function HybridTransactionsResponseToJSON(json) {
+    return HybridTransactionsResponseToJSONTyped(json, false);
+}
+exports.HybridTransactionsResponseToJSON = HybridTransactionsResponseToJSON;
+function HybridTransactionsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -74956,7 +75167,7 @@ function HybridTransactionsResponseToJSON(value) {
         'data': (0, HybridTransactionsResponseData_1.HybridTransactionsResponseDataToJSON)(value['data']),
     };
 }
-exports.HybridTransactionsResponseToJSON = HybridTransactionsResponseToJSON;
+exports.HybridTransactionsResponseToJSONTyped = HybridTransactionsResponseToJSONTyped;
 
 
 /***/ }),
@@ -74975,7 +75186,7 @@ exports.HybridTransactionsResponseToJSON = HybridTransactionsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.HybridTransactionsResponseDataToJSON = exports.HybridTransactionsResponseDataFromJSONTyped = exports.HybridTransactionsResponseDataFromJSON = exports.instanceOfHybridTransactionsResponseData = void 0;
+exports.HybridTransactionsResponseDataToJSONTyped = exports.HybridTransactionsResponseDataToJSON = exports.HybridTransactionsResponseDataFromJSONTyped = exports.HybridTransactionsResponseDataFromJSON = exports.instanceOfHybridTransactionsResponseData = void 0;
 const HybridTransaction_1 = __nccwpck_require__(9710);
 /**
  * Check if a given object implements the HybridTransactionsResponseData interface.
@@ -75000,7 +75211,11 @@ function HybridTransactionsResponseDataFromJSONTyped(json, ignoreDiscriminator) 
     };
 }
 exports.HybridTransactionsResponseDataFromJSONTyped = HybridTransactionsResponseDataFromJSONTyped;
-function HybridTransactionsResponseDataToJSON(value) {
+function HybridTransactionsResponseDataToJSON(json) {
+    return HybridTransactionsResponseDataToJSONTyped(json, false);
+}
+exports.HybridTransactionsResponseDataToJSON = HybridTransactionsResponseDataToJSON;
+function HybridTransactionsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75009,7 +75224,7 @@ function HybridTransactionsResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.HybridTransactionsResponseDataToJSON = HybridTransactionsResponseDataToJSON;
+exports.HybridTransactionsResponseDataToJSONTyped = HybridTransactionsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -75028,7 +75243,7 @@ exports.HybridTransactionsResponseDataToJSON = HybridTransactionsResponseDataToJ
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthDetailToJSON = exports.MonthDetailFromJSONTyped = exports.MonthDetailFromJSON = exports.instanceOfMonthDetail = void 0;
+exports.MonthDetailToJSONTyped = exports.MonthDetailToJSON = exports.MonthDetailFromJSONTyped = exports.MonthDetailFromJSON = exports.instanceOfMonthDetail = void 0;
 const Category_1 = __nccwpck_require__(3466);
 /**
  * Check if a given object implements the MonthDetail interface.
@@ -75072,7 +75287,11 @@ function MonthDetailFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthDetailFromJSONTyped = MonthDetailFromJSONTyped;
-function MonthDetailToJSON(value) {
+function MonthDetailToJSON(json) {
+    return MonthDetailToJSONTyped(json, false);
+}
+exports.MonthDetailToJSON = MonthDetailToJSON;
+function MonthDetailToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75088,7 +75307,7 @@ function MonthDetailToJSON(value) {
         'categories': (value['categories'].map(Category_1.CategoryToJSON)),
     };
 }
-exports.MonthDetailToJSON = MonthDetailToJSON;
+exports.MonthDetailToJSONTyped = MonthDetailToJSONTyped;
 
 
 /***/ }),
@@ -75107,7 +75326,7 @@ exports.MonthDetailToJSON = MonthDetailToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthDetailResponseToJSON = exports.MonthDetailResponseFromJSONTyped = exports.MonthDetailResponseFromJSON = exports.instanceOfMonthDetailResponse = void 0;
+exports.MonthDetailResponseToJSONTyped = exports.MonthDetailResponseToJSON = exports.MonthDetailResponseFromJSONTyped = exports.MonthDetailResponseFromJSON = exports.instanceOfMonthDetailResponse = void 0;
 const MonthDetailResponseData_1 = __nccwpck_require__(1176);
 /**
  * Check if a given object implements the MonthDetailResponse interface.
@@ -75131,7 +75350,11 @@ function MonthDetailResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthDetailResponseFromJSONTyped = MonthDetailResponseFromJSONTyped;
-function MonthDetailResponseToJSON(value) {
+function MonthDetailResponseToJSON(json) {
+    return MonthDetailResponseToJSONTyped(json, false);
+}
+exports.MonthDetailResponseToJSON = MonthDetailResponseToJSON;
+function MonthDetailResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75139,7 +75362,7 @@ function MonthDetailResponseToJSON(value) {
         'data': (0, MonthDetailResponseData_1.MonthDetailResponseDataToJSON)(value['data']),
     };
 }
-exports.MonthDetailResponseToJSON = MonthDetailResponseToJSON;
+exports.MonthDetailResponseToJSONTyped = MonthDetailResponseToJSONTyped;
 
 
 /***/ }),
@@ -75158,7 +75381,7 @@ exports.MonthDetailResponseToJSON = MonthDetailResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthDetailResponseDataToJSON = exports.MonthDetailResponseDataFromJSONTyped = exports.MonthDetailResponseDataFromJSON = exports.instanceOfMonthDetailResponseData = void 0;
+exports.MonthDetailResponseDataToJSONTyped = exports.MonthDetailResponseDataToJSON = exports.MonthDetailResponseDataFromJSONTyped = exports.MonthDetailResponseDataFromJSON = exports.instanceOfMonthDetailResponseData = void 0;
 const MonthDetail_1 = __nccwpck_require__(2627);
 /**
  * Check if a given object implements the MonthDetailResponseData interface.
@@ -75182,7 +75405,11 @@ function MonthDetailResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthDetailResponseDataFromJSONTyped = MonthDetailResponseDataFromJSONTyped;
-function MonthDetailResponseDataToJSON(value) {
+function MonthDetailResponseDataToJSON(json) {
+    return MonthDetailResponseDataToJSONTyped(json, false);
+}
+exports.MonthDetailResponseDataToJSON = MonthDetailResponseDataToJSON;
+function MonthDetailResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75190,7 +75417,7 @@ function MonthDetailResponseDataToJSON(value) {
         'month': (0, MonthDetail_1.MonthDetailToJSON)(value['month']),
     };
 }
-exports.MonthDetailResponseDataToJSON = MonthDetailResponseDataToJSON;
+exports.MonthDetailResponseDataToJSONTyped = MonthDetailResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -75209,7 +75436,7 @@ exports.MonthDetailResponseDataToJSON = MonthDetailResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthSummariesResponseToJSON = exports.MonthSummariesResponseFromJSONTyped = exports.MonthSummariesResponseFromJSON = exports.instanceOfMonthSummariesResponse = void 0;
+exports.MonthSummariesResponseToJSONTyped = exports.MonthSummariesResponseToJSON = exports.MonthSummariesResponseFromJSONTyped = exports.MonthSummariesResponseFromJSON = exports.instanceOfMonthSummariesResponse = void 0;
 const MonthSummariesResponseData_1 = __nccwpck_require__(2487);
 /**
  * Check if a given object implements the MonthSummariesResponse interface.
@@ -75233,7 +75460,11 @@ function MonthSummariesResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthSummariesResponseFromJSONTyped = MonthSummariesResponseFromJSONTyped;
-function MonthSummariesResponseToJSON(value) {
+function MonthSummariesResponseToJSON(json) {
+    return MonthSummariesResponseToJSONTyped(json, false);
+}
+exports.MonthSummariesResponseToJSON = MonthSummariesResponseToJSON;
+function MonthSummariesResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75241,7 +75472,7 @@ function MonthSummariesResponseToJSON(value) {
         'data': (0, MonthSummariesResponseData_1.MonthSummariesResponseDataToJSON)(value['data']),
     };
 }
-exports.MonthSummariesResponseToJSON = MonthSummariesResponseToJSON;
+exports.MonthSummariesResponseToJSONTyped = MonthSummariesResponseToJSONTyped;
 
 
 /***/ }),
@@ -75260,7 +75491,7 @@ exports.MonthSummariesResponseToJSON = MonthSummariesResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthSummariesResponseDataToJSON = exports.MonthSummariesResponseDataFromJSONTyped = exports.MonthSummariesResponseDataFromJSON = exports.instanceOfMonthSummariesResponseData = void 0;
+exports.MonthSummariesResponseDataToJSONTyped = exports.MonthSummariesResponseDataToJSON = exports.MonthSummariesResponseDataFromJSONTyped = exports.MonthSummariesResponseDataFromJSON = exports.instanceOfMonthSummariesResponseData = void 0;
 const MonthSummary_1 = __nccwpck_require__(5280);
 /**
  * Check if a given object implements the MonthSummariesResponseData interface.
@@ -75287,7 +75518,11 @@ function MonthSummariesResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthSummariesResponseDataFromJSONTyped = MonthSummariesResponseDataFromJSONTyped;
-function MonthSummariesResponseDataToJSON(value) {
+function MonthSummariesResponseDataToJSON(json) {
+    return MonthSummariesResponseDataToJSONTyped(json, false);
+}
+exports.MonthSummariesResponseDataToJSON = MonthSummariesResponseDataToJSON;
+function MonthSummariesResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75296,7 +75531,7 @@ function MonthSummariesResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.MonthSummariesResponseDataToJSON = MonthSummariesResponseDataToJSON;
+exports.MonthSummariesResponseDataToJSONTyped = MonthSummariesResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -75315,7 +75550,7 @@ exports.MonthSummariesResponseDataToJSON = MonthSummariesResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MonthSummaryToJSON = exports.MonthSummaryFromJSONTyped = exports.MonthSummaryFromJSON = exports.instanceOfMonthSummary = void 0;
+exports.MonthSummaryToJSONTyped = exports.MonthSummaryToJSON = exports.MonthSummaryFromJSONTyped = exports.MonthSummaryFromJSON = exports.instanceOfMonthSummary = void 0;
 /**
  * Check if a given object implements the MonthSummary interface.
  */
@@ -75355,7 +75590,11 @@ function MonthSummaryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.MonthSummaryFromJSONTyped = MonthSummaryFromJSONTyped;
-function MonthSummaryToJSON(value) {
+function MonthSummaryToJSON(json) {
+    return MonthSummaryToJSONTyped(json, false);
+}
+exports.MonthSummaryToJSON = MonthSummaryToJSON;
+function MonthSummaryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75370,7 +75609,7 @@ function MonthSummaryToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.MonthSummaryToJSON = MonthSummaryToJSON;
+exports.MonthSummaryToJSONTyped = MonthSummaryToJSONTyped;
 
 
 /***/ }),
@@ -75389,7 +75628,7 @@ exports.MonthSummaryToJSON = MonthSummaryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.NewTransactionToJSON = exports.NewTransactionFromJSONTyped = exports.NewTransactionFromJSON = exports.instanceOfNewTransaction = void 0;
+exports.NewTransactionToJSONTyped = exports.NewTransactionToJSON = exports.NewTransactionFromJSONTyped = exports.NewTransactionFromJSON = exports.instanceOfNewTransaction = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 const SaveSubTransaction_1 = __nccwpck_require__(4033);
@@ -75424,7 +75663,11 @@ function NewTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.NewTransactionFromJSONTyped = NewTransactionFromJSONTyped;
-function NewTransactionToJSON(value) {
+function NewTransactionToJSON(json) {
+    return NewTransactionToJSONTyped(json, false);
+}
+exports.NewTransactionToJSON = NewTransactionToJSON;
+function NewTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75443,7 +75686,7 @@ function NewTransactionToJSON(value) {
         'import_id': value['import_id'],
     };
 }
-exports.NewTransactionToJSON = NewTransactionToJSON;
+exports.NewTransactionToJSONTyped = NewTransactionToJSONTyped;
 
 
 /***/ }),
@@ -75462,7 +75705,7 @@ exports.NewTransactionToJSON = NewTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PatchCategoryWrapperToJSON = exports.PatchCategoryWrapperFromJSONTyped = exports.PatchCategoryWrapperFromJSON = exports.instanceOfPatchCategoryWrapper = void 0;
+exports.PatchCategoryWrapperToJSONTyped = exports.PatchCategoryWrapperToJSON = exports.PatchCategoryWrapperFromJSONTyped = exports.PatchCategoryWrapperFromJSON = exports.instanceOfPatchCategoryWrapper = void 0;
 const SaveCategory_1 = __nccwpck_require__(6063);
 /**
  * Check if a given object implements the PatchCategoryWrapper interface.
@@ -75486,7 +75729,11 @@ function PatchCategoryWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PatchCategoryWrapperFromJSONTyped = PatchCategoryWrapperFromJSONTyped;
-function PatchCategoryWrapperToJSON(value) {
+function PatchCategoryWrapperToJSON(json) {
+    return PatchCategoryWrapperToJSONTyped(json, false);
+}
+exports.PatchCategoryWrapperToJSON = PatchCategoryWrapperToJSON;
+function PatchCategoryWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75494,7 +75741,7 @@ function PatchCategoryWrapperToJSON(value) {
         'category': (0, SaveCategory_1.SaveCategoryToJSON)(value['category']),
     };
 }
-exports.PatchCategoryWrapperToJSON = PatchCategoryWrapperToJSON;
+exports.PatchCategoryWrapperToJSONTyped = PatchCategoryWrapperToJSONTyped;
 
 
 /***/ }),
@@ -75513,7 +75760,7 @@ exports.PatchCategoryWrapperToJSON = PatchCategoryWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PatchMonthCategoryWrapperToJSON = exports.PatchMonthCategoryWrapperFromJSONTyped = exports.PatchMonthCategoryWrapperFromJSON = exports.instanceOfPatchMonthCategoryWrapper = void 0;
+exports.PatchMonthCategoryWrapperToJSONTyped = exports.PatchMonthCategoryWrapperToJSON = exports.PatchMonthCategoryWrapperFromJSONTyped = exports.PatchMonthCategoryWrapperFromJSON = exports.instanceOfPatchMonthCategoryWrapper = void 0;
 const SaveMonthCategory_1 = __nccwpck_require__(3585);
 /**
  * Check if a given object implements the PatchMonthCategoryWrapper interface.
@@ -75537,7 +75784,11 @@ function PatchMonthCategoryWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PatchMonthCategoryWrapperFromJSONTyped = PatchMonthCategoryWrapperFromJSONTyped;
-function PatchMonthCategoryWrapperToJSON(value) {
+function PatchMonthCategoryWrapperToJSON(json) {
+    return PatchMonthCategoryWrapperToJSONTyped(json, false);
+}
+exports.PatchMonthCategoryWrapperToJSON = PatchMonthCategoryWrapperToJSON;
+function PatchMonthCategoryWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75545,7 +75796,7 @@ function PatchMonthCategoryWrapperToJSON(value) {
         'category': (0, SaveMonthCategory_1.SaveMonthCategoryToJSON)(value['category']),
     };
 }
-exports.PatchMonthCategoryWrapperToJSON = PatchMonthCategoryWrapperToJSON;
+exports.PatchMonthCategoryWrapperToJSONTyped = PatchMonthCategoryWrapperToJSONTyped;
 
 
 /***/ }),
@@ -75564,7 +75815,7 @@ exports.PatchMonthCategoryWrapperToJSON = PatchMonthCategoryWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PatchPayeeWrapperToJSON = exports.PatchPayeeWrapperFromJSONTyped = exports.PatchPayeeWrapperFromJSON = exports.instanceOfPatchPayeeWrapper = void 0;
+exports.PatchPayeeWrapperToJSONTyped = exports.PatchPayeeWrapperToJSON = exports.PatchPayeeWrapperFromJSONTyped = exports.PatchPayeeWrapperFromJSON = exports.instanceOfPatchPayeeWrapper = void 0;
 const SavePayee_1 = __nccwpck_require__(7507);
 /**
  * Check if a given object implements the PatchPayeeWrapper interface.
@@ -75588,7 +75839,11 @@ function PatchPayeeWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PatchPayeeWrapperFromJSONTyped = PatchPayeeWrapperFromJSONTyped;
-function PatchPayeeWrapperToJSON(value) {
+function PatchPayeeWrapperToJSON(json) {
+    return PatchPayeeWrapperToJSONTyped(json, false);
+}
+exports.PatchPayeeWrapperToJSON = PatchPayeeWrapperToJSON;
+function PatchPayeeWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75596,7 +75851,7 @@ function PatchPayeeWrapperToJSON(value) {
         'payee': (0, SavePayee_1.SavePayeeToJSON)(value['payee']),
     };
 }
-exports.PatchPayeeWrapperToJSON = PatchPayeeWrapperToJSON;
+exports.PatchPayeeWrapperToJSONTyped = PatchPayeeWrapperToJSONTyped;
 
 
 /***/ }),
@@ -75615,7 +75870,7 @@ exports.PatchPayeeWrapperToJSON = PatchPayeeWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PatchTransactionsWrapperToJSON = exports.PatchTransactionsWrapperFromJSONTyped = exports.PatchTransactionsWrapperFromJSON = exports.instanceOfPatchTransactionsWrapper = void 0;
+exports.PatchTransactionsWrapperToJSONTyped = exports.PatchTransactionsWrapperToJSON = exports.PatchTransactionsWrapperFromJSONTyped = exports.PatchTransactionsWrapperFromJSON = exports.instanceOfPatchTransactionsWrapper = void 0;
 const SaveTransactionWithIdOrImportId_1 = __nccwpck_require__(1155);
 /**
  * Check if a given object implements the PatchTransactionsWrapper interface.
@@ -75639,7 +75894,11 @@ function PatchTransactionsWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PatchTransactionsWrapperFromJSONTyped = PatchTransactionsWrapperFromJSONTyped;
-function PatchTransactionsWrapperToJSON(value) {
+function PatchTransactionsWrapperToJSON(json) {
+    return PatchTransactionsWrapperToJSONTyped(json, false);
+}
+exports.PatchTransactionsWrapperToJSON = PatchTransactionsWrapperToJSON;
+function PatchTransactionsWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75647,7 +75906,7 @@ function PatchTransactionsWrapperToJSON(value) {
         'transactions': (value['transactions'].map(SaveTransactionWithIdOrImportId_1.SaveTransactionWithIdOrImportIdToJSON)),
     };
 }
-exports.PatchTransactionsWrapperToJSON = PatchTransactionsWrapperToJSON;
+exports.PatchTransactionsWrapperToJSONTyped = PatchTransactionsWrapperToJSONTyped;
 
 
 /***/ }),
@@ -75666,7 +75925,7 @@ exports.PatchTransactionsWrapperToJSON = PatchTransactionsWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeToJSON = exports.PayeeFromJSONTyped = exports.PayeeFromJSON = exports.instanceOfPayee = void 0;
+exports.PayeeToJSONTyped = exports.PayeeToJSON = exports.PayeeFromJSONTyped = exports.PayeeFromJSON = exports.instanceOfPayee = void 0;
 /**
  * Check if a given object implements the Payee interface.
  */
@@ -75696,7 +75955,11 @@ function PayeeFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeFromJSONTyped = PayeeFromJSONTyped;
-function PayeeToJSON(value) {
+function PayeeToJSON(json) {
+    return PayeeToJSONTyped(json, false);
+}
+exports.PayeeToJSON = PayeeToJSON;
+function PayeeToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75707,7 +75970,7 @@ function PayeeToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.PayeeToJSON = PayeeToJSON;
+exports.PayeeToJSONTyped = PayeeToJSONTyped;
 
 
 /***/ }),
@@ -75726,7 +75989,7 @@ exports.PayeeToJSON = PayeeToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeLocationToJSON = exports.PayeeLocationFromJSONTyped = exports.PayeeLocationFromJSON = exports.instanceOfPayeeLocation = void 0;
+exports.PayeeLocationToJSONTyped = exports.PayeeLocationToJSON = exports.PayeeLocationFromJSONTyped = exports.PayeeLocationFromJSON = exports.instanceOfPayeeLocation = void 0;
 /**
  * Check if a given object implements the PayeeLocation interface.
  */
@@ -75761,7 +76024,11 @@ function PayeeLocationFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeLocationFromJSONTyped = PayeeLocationFromJSONTyped;
-function PayeeLocationToJSON(value) {
+function PayeeLocationToJSON(json) {
+    return PayeeLocationToJSONTyped(json, false);
+}
+exports.PayeeLocationToJSON = PayeeLocationToJSON;
+function PayeeLocationToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75773,7 +76040,7 @@ function PayeeLocationToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.PayeeLocationToJSON = PayeeLocationToJSON;
+exports.PayeeLocationToJSONTyped = PayeeLocationToJSONTyped;
 
 
 /***/ }),
@@ -75792,7 +76059,7 @@ exports.PayeeLocationToJSON = PayeeLocationToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeLocationResponseToJSON = exports.PayeeLocationResponseFromJSONTyped = exports.PayeeLocationResponseFromJSON = exports.instanceOfPayeeLocationResponse = void 0;
+exports.PayeeLocationResponseToJSONTyped = exports.PayeeLocationResponseToJSON = exports.PayeeLocationResponseFromJSONTyped = exports.PayeeLocationResponseFromJSON = exports.instanceOfPayeeLocationResponse = void 0;
 const PayeeLocationResponseData_1 = __nccwpck_require__(4928);
 /**
  * Check if a given object implements the PayeeLocationResponse interface.
@@ -75816,7 +76083,11 @@ function PayeeLocationResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeLocationResponseFromJSONTyped = PayeeLocationResponseFromJSONTyped;
-function PayeeLocationResponseToJSON(value) {
+function PayeeLocationResponseToJSON(json) {
+    return PayeeLocationResponseToJSONTyped(json, false);
+}
+exports.PayeeLocationResponseToJSON = PayeeLocationResponseToJSON;
+function PayeeLocationResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75824,7 +76095,7 @@ function PayeeLocationResponseToJSON(value) {
         'data': (0, PayeeLocationResponseData_1.PayeeLocationResponseDataToJSON)(value['data']),
     };
 }
-exports.PayeeLocationResponseToJSON = PayeeLocationResponseToJSON;
+exports.PayeeLocationResponseToJSONTyped = PayeeLocationResponseToJSONTyped;
 
 
 /***/ }),
@@ -75843,7 +76114,7 @@ exports.PayeeLocationResponseToJSON = PayeeLocationResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeLocationResponseDataToJSON = exports.PayeeLocationResponseDataFromJSONTyped = exports.PayeeLocationResponseDataFromJSON = exports.instanceOfPayeeLocationResponseData = void 0;
+exports.PayeeLocationResponseDataToJSONTyped = exports.PayeeLocationResponseDataToJSON = exports.PayeeLocationResponseDataFromJSONTyped = exports.PayeeLocationResponseDataFromJSON = exports.instanceOfPayeeLocationResponseData = void 0;
 const PayeeLocation_1 = __nccwpck_require__(1387);
 /**
  * Check if a given object implements the PayeeLocationResponseData interface.
@@ -75867,7 +76138,11 @@ function PayeeLocationResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeLocationResponseDataFromJSONTyped = PayeeLocationResponseDataFromJSONTyped;
-function PayeeLocationResponseDataToJSON(value) {
+function PayeeLocationResponseDataToJSON(json) {
+    return PayeeLocationResponseDataToJSONTyped(json, false);
+}
+exports.PayeeLocationResponseDataToJSON = PayeeLocationResponseDataToJSON;
+function PayeeLocationResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75875,7 +76150,7 @@ function PayeeLocationResponseDataToJSON(value) {
         'payee_location': (0, PayeeLocation_1.PayeeLocationToJSON)(value['payee_location']),
     };
 }
-exports.PayeeLocationResponseDataToJSON = PayeeLocationResponseDataToJSON;
+exports.PayeeLocationResponseDataToJSONTyped = PayeeLocationResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -75894,7 +76169,7 @@ exports.PayeeLocationResponseDataToJSON = PayeeLocationResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeLocationsResponseToJSON = exports.PayeeLocationsResponseFromJSONTyped = exports.PayeeLocationsResponseFromJSON = exports.instanceOfPayeeLocationsResponse = void 0;
+exports.PayeeLocationsResponseToJSONTyped = exports.PayeeLocationsResponseToJSON = exports.PayeeLocationsResponseFromJSONTyped = exports.PayeeLocationsResponseFromJSON = exports.instanceOfPayeeLocationsResponse = void 0;
 const PayeeLocationsResponseData_1 = __nccwpck_require__(17);
 /**
  * Check if a given object implements the PayeeLocationsResponse interface.
@@ -75918,7 +76193,11 @@ function PayeeLocationsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeLocationsResponseFromJSONTyped = PayeeLocationsResponseFromJSONTyped;
-function PayeeLocationsResponseToJSON(value) {
+function PayeeLocationsResponseToJSON(json) {
+    return PayeeLocationsResponseToJSONTyped(json, false);
+}
+exports.PayeeLocationsResponseToJSON = PayeeLocationsResponseToJSON;
+function PayeeLocationsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75926,7 +76205,7 @@ function PayeeLocationsResponseToJSON(value) {
         'data': (0, PayeeLocationsResponseData_1.PayeeLocationsResponseDataToJSON)(value['data']),
     };
 }
-exports.PayeeLocationsResponseToJSON = PayeeLocationsResponseToJSON;
+exports.PayeeLocationsResponseToJSONTyped = PayeeLocationsResponseToJSONTyped;
 
 
 /***/ }),
@@ -75945,7 +76224,7 @@ exports.PayeeLocationsResponseToJSON = PayeeLocationsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeLocationsResponseDataToJSON = exports.PayeeLocationsResponseDataFromJSONTyped = exports.PayeeLocationsResponseDataFromJSON = exports.instanceOfPayeeLocationsResponseData = void 0;
+exports.PayeeLocationsResponseDataToJSONTyped = exports.PayeeLocationsResponseDataToJSON = exports.PayeeLocationsResponseDataFromJSONTyped = exports.PayeeLocationsResponseDataFromJSON = exports.instanceOfPayeeLocationsResponseData = void 0;
 const PayeeLocation_1 = __nccwpck_require__(1387);
 /**
  * Check if a given object implements the PayeeLocationsResponseData interface.
@@ -75969,7 +76248,11 @@ function PayeeLocationsResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeLocationsResponseDataFromJSONTyped = PayeeLocationsResponseDataFromJSONTyped;
-function PayeeLocationsResponseDataToJSON(value) {
+function PayeeLocationsResponseDataToJSON(json) {
+    return PayeeLocationsResponseDataToJSONTyped(json, false);
+}
+exports.PayeeLocationsResponseDataToJSON = PayeeLocationsResponseDataToJSON;
+function PayeeLocationsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -75977,7 +76260,7 @@ function PayeeLocationsResponseDataToJSON(value) {
         'payee_locations': (value['payee_locations'].map(PayeeLocation_1.PayeeLocationToJSON)),
     };
 }
-exports.PayeeLocationsResponseDataToJSON = PayeeLocationsResponseDataToJSON;
+exports.PayeeLocationsResponseDataToJSONTyped = PayeeLocationsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -75996,7 +76279,7 @@ exports.PayeeLocationsResponseDataToJSON = PayeeLocationsResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeResponseToJSON = exports.PayeeResponseFromJSONTyped = exports.PayeeResponseFromJSON = exports.instanceOfPayeeResponse = void 0;
+exports.PayeeResponseToJSONTyped = exports.PayeeResponseToJSON = exports.PayeeResponseFromJSONTyped = exports.PayeeResponseFromJSON = exports.instanceOfPayeeResponse = void 0;
 const PayeeResponseData_1 = __nccwpck_require__(8847);
 /**
  * Check if a given object implements the PayeeResponse interface.
@@ -76020,7 +76303,11 @@ function PayeeResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeResponseFromJSONTyped = PayeeResponseFromJSONTyped;
-function PayeeResponseToJSON(value) {
+function PayeeResponseToJSON(json) {
+    return PayeeResponseToJSONTyped(json, false);
+}
+exports.PayeeResponseToJSON = PayeeResponseToJSON;
+function PayeeResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76028,7 +76315,7 @@ function PayeeResponseToJSON(value) {
         'data': (0, PayeeResponseData_1.PayeeResponseDataToJSON)(value['data']),
     };
 }
-exports.PayeeResponseToJSON = PayeeResponseToJSON;
+exports.PayeeResponseToJSONTyped = PayeeResponseToJSONTyped;
 
 
 /***/ }),
@@ -76047,7 +76334,7 @@ exports.PayeeResponseToJSON = PayeeResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeeResponseDataToJSON = exports.PayeeResponseDataFromJSONTyped = exports.PayeeResponseDataFromJSON = exports.instanceOfPayeeResponseData = void 0;
+exports.PayeeResponseDataToJSONTyped = exports.PayeeResponseDataToJSON = exports.PayeeResponseDataFromJSONTyped = exports.PayeeResponseDataFromJSON = exports.instanceOfPayeeResponseData = void 0;
 const Payee_1 = __nccwpck_require__(1824);
 /**
  * Check if a given object implements the PayeeResponseData interface.
@@ -76071,7 +76358,11 @@ function PayeeResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeeResponseDataFromJSONTyped = PayeeResponseDataFromJSONTyped;
-function PayeeResponseDataToJSON(value) {
+function PayeeResponseDataToJSON(json) {
+    return PayeeResponseDataToJSONTyped(json, false);
+}
+exports.PayeeResponseDataToJSON = PayeeResponseDataToJSON;
+function PayeeResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76079,7 +76370,7 @@ function PayeeResponseDataToJSON(value) {
         'payee': (0, Payee_1.PayeeToJSON)(value['payee']),
     };
 }
-exports.PayeeResponseDataToJSON = PayeeResponseDataToJSON;
+exports.PayeeResponseDataToJSONTyped = PayeeResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -76098,7 +76389,7 @@ exports.PayeeResponseDataToJSON = PayeeResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeesResponseToJSON = exports.PayeesResponseFromJSONTyped = exports.PayeesResponseFromJSON = exports.instanceOfPayeesResponse = void 0;
+exports.PayeesResponseToJSONTyped = exports.PayeesResponseToJSON = exports.PayeesResponseFromJSONTyped = exports.PayeesResponseFromJSON = exports.instanceOfPayeesResponse = void 0;
 const PayeesResponseData_1 = __nccwpck_require__(3780);
 /**
  * Check if a given object implements the PayeesResponse interface.
@@ -76122,7 +76413,11 @@ function PayeesResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeesResponseFromJSONTyped = PayeesResponseFromJSONTyped;
-function PayeesResponseToJSON(value) {
+function PayeesResponseToJSON(json) {
+    return PayeesResponseToJSONTyped(json, false);
+}
+exports.PayeesResponseToJSON = PayeesResponseToJSON;
+function PayeesResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76130,7 +76425,7 @@ function PayeesResponseToJSON(value) {
         'data': (0, PayeesResponseData_1.PayeesResponseDataToJSON)(value['data']),
     };
 }
-exports.PayeesResponseToJSON = PayeesResponseToJSON;
+exports.PayeesResponseToJSONTyped = PayeesResponseToJSONTyped;
 
 
 /***/ }),
@@ -76149,7 +76444,7 @@ exports.PayeesResponseToJSON = PayeesResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PayeesResponseDataToJSON = exports.PayeesResponseDataFromJSONTyped = exports.PayeesResponseDataFromJSON = exports.instanceOfPayeesResponseData = void 0;
+exports.PayeesResponseDataToJSONTyped = exports.PayeesResponseDataToJSON = exports.PayeesResponseDataFromJSONTyped = exports.PayeesResponseDataFromJSON = exports.instanceOfPayeesResponseData = void 0;
 const Payee_1 = __nccwpck_require__(1824);
 /**
  * Check if a given object implements the PayeesResponseData interface.
@@ -76176,7 +76471,11 @@ function PayeesResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PayeesResponseDataFromJSONTyped = PayeesResponseDataFromJSONTyped;
-function PayeesResponseDataToJSON(value) {
+function PayeesResponseDataToJSON(json) {
+    return PayeesResponseDataToJSONTyped(json, false);
+}
+exports.PayeesResponseDataToJSON = PayeesResponseDataToJSON;
+function PayeesResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76185,7 +76484,7 @@ function PayeesResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.PayeesResponseDataToJSON = PayeesResponseDataToJSON;
+exports.PayeesResponseDataToJSONTyped = PayeesResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -76204,7 +76503,7 @@ exports.PayeesResponseDataToJSON = PayeesResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PostAccountWrapperToJSON = exports.PostAccountWrapperFromJSONTyped = exports.PostAccountWrapperFromJSON = exports.instanceOfPostAccountWrapper = void 0;
+exports.PostAccountWrapperToJSONTyped = exports.PostAccountWrapperToJSON = exports.PostAccountWrapperFromJSONTyped = exports.PostAccountWrapperFromJSON = exports.instanceOfPostAccountWrapper = void 0;
 const SaveAccount_1 = __nccwpck_require__(9580);
 /**
  * Check if a given object implements the PostAccountWrapper interface.
@@ -76228,7 +76527,11 @@ function PostAccountWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PostAccountWrapperFromJSONTyped = PostAccountWrapperFromJSONTyped;
-function PostAccountWrapperToJSON(value) {
+function PostAccountWrapperToJSON(json) {
+    return PostAccountWrapperToJSONTyped(json, false);
+}
+exports.PostAccountWrapperToJSON = PostAccountWrapperToJSON;
+function PostAccountWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76236,7 +76539,7 @@ function PostAccountWrapperToJSON(value) {
         'account': (0, SaveAccount_1.SaveAccountToJSON)(value['account']),
     };
 }
-exports.PostAccountWrapperToJSON = PostAccountWrapperToJSON;
+exports.PostAccountWrapperToJSONTyped = PostAccountWrapperToJSONTyped;
 
 
 /***/ }),
@@ -76255,7 +76558,7 @@ exports.PostAccountWrapperToJSON = PostAccountWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PostScheduledTransactionWrapperToJSON = exports.PostScheduledTransactionWrapperFromJSONTyped = exports.PostScheduledTransactionWrapperFromJSON = exports.instanceOfPostScheduledTransactionWrapper = void 0;
+exports.PostScheduledTransactionWrapperToJSONTyped = exports.PostScheduledTransactionWrapperToJSON = exports.PostScheduledTransactionWrapperFromJSONTyped = exports.PostScheduledTransactionWrapperFromJSON = exports.instanceOfPostScheduledTransactionWrapper = void 0;
 const SaveScheduledTransaction_1 = __nccwpck_require__(8126);
 /**
  * Check if a given object implements the PostScheduledTransactionWrapper interface.
@@ -76279,7 +76582,11 @@ function PostScheduledTransactionWrapperFromJSONTyped(json, ignoreDiscriminator)
     };
 }
 exports.PostScheduledTransactionWrapperFromJSONTyped = PostScheduledTransactionWrapperFromJSONTyped;
-function PostScheduledTransactionWrapperToJSON(value) {
+function PostScheduledTransactionWrapperToJSON(json) {
+    return PostScheduledTransactionWrapperToJSONTyped(json, false);
+}
+exports.PostScheduledTransactionWrapperToJSON = PostScheduledTransactionWrapperToJSON;
+function PostScheduledTransactionWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76287,7 +76594,7 @@ function PostScheduledTransactionWrapperToJSON(value) {
         'scheduled_transaction': (0, SaveScheduledTransaction_1.SaveScheduledTransactionToJSON)(value['scheduled_transaction']),
     };
 }
-exports.PostScheduledTransactionWrapperToJSON = PostScheduledTransactionWrapperToJSON;
+exports.PostScheduledTransactionWrapperToJSONTyped = PostScheduledTransactionWrapperToJSONTyped;
 
 
 /***/ }),
@@ -76306,7 +76613,7 @@ exports.PostScheduledTransactionWrapperToJSON = PostScheduledTransactionWrapperT
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PostTransactionsWrapperToJSON = exports.PostTransactionsWrapperFromJSONTyped = exports.PostTransactionsWrapperFromJSON = exports.instanceOfPostTransactionsWrapper = void 0;
+exports.PostTransactionsWrapperToJSONTyped = exports.PostTransactionsWrapperToJSON = exports.PostTransactionsWrapperFromJSONTyped = exports.PostTransactionsWrapperFromJSON = exports.instanceOfPostTransactionsWrapper = void 0;
 const NewTransaction_1 = __nccwpck_require__(9164);
 /**
  * Check if a given object implements the PostTransactionsWrapper interface.
@@ -76329,7 +76636,11 @@ function PostTransactionsWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PostTransactionsWrapperFromJSONTyped = PostTransactionsWrapperFromJSONTyped;
-function PostTransactionsWrapperToJSON(value) {
+function PostTransactionsWrapperToJSON(json) {
+    return PostTransactionsWrapperToJSONTyped(json, false);
+}
+exports.PostTransactionsWrapperToJSON = PostTransactionsWrapperToJSON;
+function PostTransactionsWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76338,7 +76649,62 @@ function PostTransactionsWrapperToJSON(value) {
         'transactions': value['transactions'] == null ? undefined : (value['transactions'].map(NewTransaction_1.NewTransactionToJSON)),
     };
 }
-exports.PostTransactionsWrapperToJSON = PostTransactionsWrapperToJSON;
+exports.PostTransactionsWrapperToJSONTyped = PostTransactionsWrapperToJSONTyped;
+
+
+/***/ }),
+
+/***/ 2101:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+/* tslint:disable */
+/* eslint-disable */
+/**
+ * YNAB API Endpoints
+ * Our API uses a REST based design, leverages the JSON data format, and relies upon HTTPS for transport. We respond with meaningful HTTP response codes and if an error occurs, we include error details in the response body.  API Documentation is at https://api.ynab.com
+ *
+ * Generated by: OpenAPI Generator (https://openapi-generator.tech)
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PutScheduledTransactionWrapperToJSONTyped = exports.PutScheduledTransactionWrapperToJSON = exports.PutScheduledTransactionWrapperFromJSONTyped = exports.PutScheduledTransactionWrapperFromJSON = exports.instanceOfPutScheduledTransactionWrapper = void 0;
+const SaveScheduledTransaction_1 = __nccwpck_require__(8126);
+/**
+ * Check if a given object implements the PutScheduledTransactionWrapper interface.
+ */
+function instanceOfPutScheduledTransactionWrapper(value) {
+    if (!('scheduled_transaction' in value) || value['scheduled_transaction'] === undefined)
+        return false;
+    return true;
+}
+exports.instanceOfPutScheduledTransactionWrapper = instanceOfPutScheduledTransactionWrapper;
+function PutScheduledTransactionWrapperFromJSON(json) {
+    return PutScheduledTransactionWrapperFromJSONTyped(json, false);
+}
+exports.PutScheduledTransactionWrapperFromJSON = PutScheduledTransactionWrapperFromJSON;
+function PutScheduledTransactionWrapperFromJSONTyped(json, ignoreDiscriminator) {
+    if (json == null) {
+        return json;
+    }
+    return {
+        'scheduled_transaction': (0, SaveScheduledTransaction_1.SaveScheduledTransactionFromJSON)(json['scheduled_transaction']),
+    };
+}
+exports.PutScheduledTransactionWrapperFromJSONTyped = PutScheduledTransactionWrapperFromJSONTyped;
+function PutScheduledTransactionWrapperToJSON(json) {
+    return PutScheduledTransactionWrapperToJSONTyped(json, false);
+}
+exports.PutScheduledTransactionWrapperToJSON = PutScheduledTransactionWrapperToJSON;
+function PutScheduledTransactionWrapperToJSONTyped(value, ignoreDiscriminator = false) {
+    if (value == null) {
+        return value;
+    }
+    return {
+        'scheduled_transaction': (0, SaveScheduledTransaction_1.SaveScheduledTransactionToJSON)(value['scheduled_transaction']),
+    };
+}
+exports.PutScheduledTransactionWrapperToJSONTyped = PutScheduledTransactionWrapperToJSONTyped;
 
 
 /***/ }),
@@ -76357,7 +76723,7 @@ exports.PostTransactionsWrapperToJSON = PostTransactionsWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PutTransactionWrapperToJSON = exports.PutTransactionWrapperFromJSONTyped = exports.PutTransactionWrapperFromJSON = exports.instanceOfPutTransactionWrapper = void 0;
+exports.PutTransactionWrapperToJSONTyped = exports.PutTransactionWrapperToJSON = exports.PutTransactionWrapperFromJSONTyped = exports.PutTransactionWrapperFromJSON = exports.instanceOfPutTransactionWrapper = void 0;
 const ExistingTransaction_1 = __nccwpck_require__(4011);
 /**
  * Check if a given object implements the PutTransactionWrapper interface.
@@ -76381,7 +76747,11 @@ function PutTransactionWrapperFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.PutTransactionWrapperFromJSONTyped = PutTransactionWrapperFromJSONTyped;
-function PutTransactionWrapperToJSON(value) {
+function PutTransactionWrapperToJSON(json) {
+    return PutTransactionWrapperToJSONTyped(json, false);
+}
+exports.PutTransactionWrapperToJSON = PutTransactionWrapperToJSON;
+function PutTransactionWrapperToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76389,7 +76759,7 @@ function PutTransactionWrapperToJSON(value) {
         'transaction': (0, ExistingTransaction_1.ExistingTransactionToJSON)(value['transaction']),
     };
 }
-exports.PutTransactionWrapperToJSON = PutTransactionWrapperToJSON;
+exports.PutTransactionWrapperToJSONTyped = PutTransactionWrapperToJSONTyped;
 
 
 /***/ }),
@@ -76408,7 +76778,7 @@ exports.PutTransactionWrapperToJSON = PutTransactionWrapperToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveAccountToJSON = exports.SaveAccountFromJSONTyped = exports.SaveAccountFromJSON = exports.instanceOfSaveAccount = void 0;
+exports.SaveAccountToJSONTyped = exports.SaveAccountToJSON = exports.SaveAccountFromJSONTyped = exports.SaveAccountFromJSON = exports.instanceOfSaveAccount = void 0;
 const AccountType_1 = __nccwpck_require__(5283);
 /**
  * Check if a given object implements the SaveAccount interface.
@@ -76438,7 +76808,11 @@ function SaveAccountFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveAccountFromJSONTyped = SaveAccountFromJSONTyped;
-function SaveAccountToJSON(value) {
+function SaveAccountToJSON(json) {
+    return SaveAccountToJSONTyped(json, false);
+}
+exports.SaveAccountToJSON = SaveAccountToJSON;
+function SaveAccountToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76448,7 +76822,7 @@ function SaveAccountToJSON(value) {
         'balance': value['balance'],
     };
 }
-exports.SaveAccountToJSON = SaveAccountToJSON;
+exports.SaveAccountToJSONTyped = SaveAccountToJSONTyped;
 
 
 /***/ }),
@@ -76467,7 +76841,7 @@ exports.SaveAccountToJSON = SaveAccountToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveCategoryToJSON = exports.SaveCategoryFromJSONTyped = exports.SaveCategoryFromJSON = exports.instanceOfSaveCategory = void 0;
+exports.SaveCategoryToJSONTyped = exports.SaveCategoryToJSON = exports.SaveCategoryFromJSONTyped = exports.SaveCategoryFromJSON = exports.instanceOfSaveCategory = void 0;
 /**
  * Check if a given object implements the SaveCategory interface.
  */
@@ -76487,10 +76861,15 @@ function SaveCategoryFromJSONTyped(json, ignoreDiscriminator) {
         'name': json['name'] == null ? undefined : json['name'],
         'note': json['note'] == null ? undefined : json['note'],
         'category_group_id': json['category_group_id'] == null ? undefined : json['category_group_id'],
+        'goal_target': json['goal_target'] == null ? undefined : json['goal_target'],
     };
 }
 exports.SaveCategoryFromJSONTyped = SaveCategoryFromJSONTyped;
-function SaveCategoryToJSON(value) {
+function SaveCategoryToJSON(json) {
+    return SaveCategoryToJSONTyped(json, false);
+}
+exports.SaveCategoryToJSON = SaveCategoryToJSON;
+function SaveCategoryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76498,9 +76877,10 @@ function SaveCategoryToJSON(value) {
         'name': value['name'],
         'note': value['note'],
         'category_group_id': value['category_group_id'],
+        'goal_target': value['goal_target'],
     };
 }
-exports.SaveCategoryToJSON = SaveCategoryToJSON;
+exports.SaveCategoryToJSONTyped = SaveCategoryToJSONTyped;
 
 
 /***/ }),
@@ -76519,7 +76899,7 @@ exports.SaveCategoryToJSON = SaveCategoryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveCategoryResponseToJSON = exports.SaveCategoryResponseFromJSONTyped = exports.SaveCategoryResponseFromJSON = exports.instanceOfSaveCategoryResponse = void 0;
+exports.SaveCategoryResponseToJSONTyped = exports.SaveCategoryResponseToJSON = exports.SaveCategoryResponseFromJSONTyped = exports.SaveCategoryResponseFromJSON = exports.instanceOfSaveCategoryResponse = void 0;
 const SaveCategoryResponseData_1 = __nccwpck_require__(5156);
 /**
  * Check if a given object implements the SaveCategoryResponse interface.
@@ -76543,7 +76923,11 @@ function SaveCategoryResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveCategoryResponseFromJSONTyped = SaveCategoryResponseFromJSONTyped;
-function SaveCategoryResponseToJSON(value) {
+function SaveCategoryResponseToJSON(json) {
+    return SaveCategoryResponseToJSONTyped(json, false);
+}
+exports.SaveCategoryResponseToJSON = SaveCategoryResponseToJSON;
+function SaveCategoryResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76551,7 +76935,7 @@ function SaveCategoryResponseToJSON(value) {
         'data': (0, SaveCategoryResponseData_1.SaveCategoryResponseDataToJSON)(value['data']),
     };
 }
-exports.SaveCategoryResponseToJSON = SaveCategoryResponseToJSON;
+exports.SaveCategoryResponseToJSONTyped = SaveCategoryResponseToJSONTyped;
 
 
 /***/ }),
@@ -76570,7 +76954,7 @@ exports.SaveCategoryResponseToJSON = SaveCategoryResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveCategoryResponseDataToJSON = exports.SaveCategoryResponseDataFromJSONTyped = exports.SaveCategoryResponseDataFromJSON = exports.instanceOfSaveCategoryResponseData = void 0;
+exports.SaveCategoryResponseDataToJSONTyped = exports.SaveCategoryResponseDataToJSON = exports.SaveCategoryResponseDataFromJSONTyped = exports.SaveCategoryResponseDataFromJSON = exports.instanceOfSaveCategoryResponseData = void 0;
 const Category_1 = __nccwpck_require__(3466);
 /**
  * Check if a given object implements the SaveCategoryResponseData interface.
@@ -76597,7 +76981,11 @@ function SaveCategoryResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveCategoryResponseDataFromJSONTyped = SaveCategoryResponseDataFromJSONTyped;
-function SaveCategoryResponseDataToJSON(value) {
+function SaveCategoryResponseDataToJSON(json) {
+    return SaveCategoryResponseDataToJSONTyped(json, false);
+}
+exports.SaveCategoryResponseDataToJSON = SaveCategoryResponseDataToJSON;
+function SaveCategoryResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76606,7 +76994,7 @@ function SaveCategoryResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.SaveCategoryResponseDataToJSON = SaveCategoryResponseDataToJSON;
+exports.SaveCategoryResponseDataToJSONTyped = SaveCategoryResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -76625,7 +77013,7 @@ exports.SaveCategoryResponseDataToJSON = SaveCategoryResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveMonthCategoryToJSON = exports.SaveMonthCategoryFromJSONTyped = exports.SaveMonthCategoryFromJSON = exports.instanceOfSaveMonthCategory = void 0;
+exports.SaveMonthCategoryToJSONTyped = exports.SaveMonthCategoryToJSON = exports.SaveMonthCategoryFromJSONTyped = exports.SaveMonthCategoryFromJSON = exports.instanceOfSaveMonthCategory = void 0;
 /**
  * Check if a given object implements the SaveMonthCategory interface.
  */
@@ -76648,7 +77036,11 @@ function SaveMonthCategoryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveMonthCategoryFromJSONTyped = SaveMonthCategoryFromJSONTyped;
-function SaveMonthCategoryToJSON(value) {
+function SaveMonthCategoryToJSON(json) {
+    return SaveMonthCategoryToJSONTyped(json, false);
+}
+exports.SaveMonthCategoryToJSON = SaveMonthCategoryToJSON;
+function SaveMonthCategoryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76656,7 +77048,7 @@ function SaveMonthCategoryToJSON(value) {
         'budgeted': value['budgeted'],
     };
 }
-exports.SaveMonthCategoryToJSON = SaveMonthCategoryToJSON;
+exports.SaveMonthCategoryToJSONTyped = SaveMonthCategoryToJSONTyped;
 
 
 /***/ }),
@@ -76675,7 +77067,7 @@ exports.SaveMonthCategoryToJSON = SaveMonthCategoryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SavePayeeToJSON = exports.SavePayeeFromJSONTyped = exports.SavePayeeFromJSON = exports.instanceOfSavePayee = void 0;
+exports.SavePayeeToJSONTyped = exports.SavePayeeToJSON = exports.SavePayeeFromJSONTyped = exports.SavePayeeFromJSON = exports.instanceOfSavePayee = void 0;
 /**
  * Check if a given object implements the SavePayee interface.
  */
@@ -76696,7 +77088,11 @@ function SavePayeeFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SavePayeeFromJSONTyped = SavePayeeFromJSONTyped;
-function SavePayeeToJSON(value) {
+function SavePayeeToJSON(json) {
+    return SavePayeeToJSONTyped(json, false);
+}
+exports.SavePayeeToJSON = SavePayeeToJSON;
+function SavePayeeToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76704,7 +77100,7 @@ function SavePayeeToJSON(value) {
         'name': value['name'],
     };
 }
-exports.SavePayeeToJSON = SavePayeeToJSON;
+exports.SavePayeeToJSONTyped = SavePayeeToJSONTyped;
 
 
 /***/ }),
@@ -76723,7 +77119,7 @@ exports.SavePayeeToJSON = SavePayeeToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SavePayeeResponseToJSON = exports.SavePayeeResponseFromJSONTyped = exports.SavePayeeResponseFromJSON = exports.instanceOfSavePayeeResponse = void 0;
+exports.SavePayeeResponseToJSONTyped = exports.SavePayeeResponseToJSON = exports.SavePayeeResponseFromJSONTyped = exports.SavePayeeResponseFromJSON = exports.instanceOfSavePayeeResponse = void 0;
 const SavePayeeResponseData_1 = __nccwpck_require__(5128);
 /**
  * Check if a given object implements the SavePayeeResponse interface.
@@ -76747,7 +77143,11 @@ function SavePayeeResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SavePayeeResponseFromJSONTyped = SavePayeeResponseFromJSONTyped;
-function SavePayeeResponseToJSON(value) {
+function SavePayeeResponseToJSON(json) {
+    return SavePayeeResponseToJSONTyped(json, false);
+}
+exports.SavePayeeResponseToJSON = SavePayeeResponseToJSON;
+function SavePayeeResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76755,7 +77155,7 @@ function SavePayeeResponseToJSON(value) {
         'data': (0, SavePayeeResponseData_1.SavePayeeResponseDataToJSON)(value['data']),
     };
 }
-exports.SavePayeeResponseToJSON = SavePayeeResponseToJSON;
+exports.SavePayeeResponseToJSONTyped = SavePayeeResponseToJSONTyped;
 
 
 /***/ }),
@@ -76774,7 +77174,7 @@ exports.SavePayeeResponseToJSON = SavePayeeResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SavePayeeResponseDataToJSON = exports.SavePayeeResponseDataFromJSONTyped = exports.SavePayeeResponseDataFromJSON = exports.instanceOfSavePayeeResponseData = void 0;
+exports.SavePayeeResponseDataToJSONTyped = exports.SavePayeeResponseDataToJSON = exports.SavePayeeResponseDataFromJSONTyped = exports.SavePayeeResponseDataFromJSON = exports.instanceOfSavePayeeResponseData = void 0;
 const Payee_1 = __nccwpck_require__(1824);
 /**
  * Check if a given object implements the SavePayeeResponseData interface.
@@ -76801,7 +77201,11 @@ function SavePayeeResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SavePayeeResponseDataFromJSONTyped = SavePayeeResponseDataFromJSONTyped;
-function SavePayeeResponseDataToJSON(value) {
+function SavePayeeResponseDataToJSON(json) {
+    return SavePayeeResponseDataToJSONTyped(json, false);
+}
+exports.SavePayeeResponseDataToJSON = SavePayeeResponseDataToJSON;
+function SavePayeeResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76810,7 +77214,7 @@ function SavePayeeResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.SavePayeeResponseDataToJSON = SavePayeeResponseDataToJSON;
+exports.SavePayeeResponseDataToJSONTyped = SavePayeeResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -76829,7 +77233,7 @@ exports.SavePayeeResponseDataToJSON = SavePayeeResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveScheduledTransactionToJSON = exports.SaveScheduledTransactionFromJSONTyped = exports.SaveScheduledTransactionFromJSON = exports.instanceOfSaveScheduledTransaction = void 0;
+exports.SaveScheduledTransactionToJSONTyped = exports.SaveScheduledTransactionToJSON = exports.SaveScheduledTransactionFromJSONTyped = exports.SaveScheduledTransactionFromJSON = exports.instanceOfSaveScheduledTransaction = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const ScheduledTransactionFrequency_1 = __nccwpck_require__(8033);
 /**
@@ -76864,7 +77268,11 @@ function SaveScheduledTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveScheduledTransactionFromJSONTyped = SaveScheduledTransactionFromJSONTyped;
-function SaveScheduledTransactionToJSON(value) {
+function SaveScheduledTransactionToJSON(json) {
+    return SaveScheduledTransactionToJSONTyped(json, false);
+}
+exports.SaveScheduledTransactionToJSON = SaveScheduledTransactionToJSON;
+function SaveScheduledTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76880,7 +77288,7 @@ function SaveScheduledTransactionToJSON(value) {
         'frequency': (0, ScheduledTransactionFrequency_1.ScheduledTransactionFrequencyToJSON)(value['frequency']),
     };
 }
-exports.SaveScheduledTransactionToJSON = SaveScheduledTransactionToJSON;
+exports.SaveScheduledTransactionToJSONTyped = SaveScheduledTransactionToJSONTyped;
 
 
 /***/ }),
@@ -76899,7 +77307,7 @@ exports.SaveScheduledTransactionToJSON = SaveScheduledTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveSubTransactionToJSON = exports.SaveSubTransactionFromJSONTyped = exports.SaveSubTransactionFromJSON = exports.instanceOfSaveSubTransaction = void 0;
+exports.SaveSubTransactionToJSONTyped = exports.SaveSubTransactionToJSON = exports.SaveSubTransactionFromJSONTyped = exports.SaveSubTransactionFromJSON = exports.instanceOfSaveSubTransaction = void 0;
 /**
  * Check if a given object implements the SaveSubTransaction interface.
  */
@@ -76926,7 +77334,11 @@ function SaveSubTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveSubTransactionFromJSONTyped = SaveSubTransactionFromJSONTyped;
-function SaveSubTransactionToJSON(value) {
+function SaveSubTransactionToJSON(json) {
+    return SaveSubTransactionToJSONTyped(json, false);
+}
+exports.SaveSubTransactionToJSON = SaveSubTransactionToJSON;
+function SaveSubTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -76938,7 +77350,7 @@ function SaveSubTransactionToJSON(value) {
         'memo': value['memo'],
     };
 }
-exports.SaveSubTransactionToJSON = SaveSubTransactionToJSON;
+exports.SaveSubTransactionToJSONTyped = SaveSubTransactionToJSONTyped;
 
 
 /***/ }),
@@ -76957,7 +77369,7 @@ exports.SaveSubTransactionToJSON = SaveSubTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveTransactionWithIdOrImportIdToJSON = exports.SaveTransactionWithIdOrImportIdFromJSONTyped = exports.SaveTransactionWithIdOrImportIdFromJSON = exports.instanceOfSaveTransactionWithIdOrImportId = void 0;
+exports.SaveTransactionWithIdOrImportIdToJSONTyped = exports.SaveTransactionWithIdOrImportIdToJSON = exports.SaveTransactionWithIdOrImportIdFromJSONTyped = exports.SaveTransactionWithIdOrImportIdFromJSON = exports.instanceOfSaveTransactionWithIdOrImportId = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 const SaveSubTransaction_1 = __nccwpck_require__(4033);
@@ -76993,7 +77405,11 @@ function SaveTransactionWithIdOrImportIdFromJSONTyped(json, ignoreDiscriminator)
     };
 }
 exports.SaveTransactionWithIdOrImportIdFromJSONTyped = SaveTransactionWithIdOrImportIdFromJSONTyped;
-function SaveTransactionWithIdOrImportIdToJSON(value) {
+function SaveTransactionWithIdOrImportIdToJSON(json) {
+    return SaveTransactionWithIdOrImportIdToJSONTyped(json, false);
+}
+exports.SaveTransactionWithIdOrImportIdToJSON = SaveTransactionWithIdOrImportIdToJSON;
+function SaveTransactionWithIdOrImportIdToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77013,7 +77429,7 @@ function SaveTransactionWithIdOrImportIdToJSON(value) {
         'import_id': value['import_id'],
     };
 }
-exports.SaveTransactionWithIdOrImportIdToJSON = SaveTransactionWithIdOrImportIdToJSON;
+exports.SaveTransactionWithIdOrImportIdToJSONTyped = SaveTransactionWithIdOrImportIdToJSONTyped;
 
 
 /***/ }),
@@ -77032,7 +77448,7 @@ exports.SaveTransactionWithIdOrImportIdToJSON = SaveTransactionWithIdOrImportIdT
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveTransactionWithOptionalFieldsToJSON = exports.SaveTransactionWithOptionalFieldsFromJSONTyped = exports.SaveTransactionWithOptionalFieldsFromJSON = exports.instanceOfSaveTransactionWithOptionalFields = void 0;
+exports.SaveTransactionWithOptionalFieldsToJSONTyped = exports.SaveTransactionWithOptionalFieldsToJSON = exports.SaveTransactionWithOptionalFieldsFromJSONTyped = exports.SaveTransactionWithOptionalFieldsFromJSON = exports.instanceOfSaveTransactionWithOptionalFields = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 const SaveSubTransaction_1 = __nccwpck_require__(4033);
@@ -77066,7 +77482,11 @@ function SaveTransactionWithOptionalFieldsFromJSONTyped(json, ignoreDiscriminato
     };
 }
 exports.SaveTransactionWithOptionalFieldsFromJSONTyped = SaveTransactionWithOptionalFieldsFromJSONTyped;
-function SaveTransactionWithOptionalFieldsToJSON(value) {
+function SaveTransactionWithOptionalFieldsToJSON(json) {
+    return SaveTransactionWithOptionalFieldsToJSONTyped(json, false);
+}
+exports.SaveTransactionWithOptionalFieldsToJSON = SaveTransactionWithOptionalFieldsToJSON;
+function SaveTransactionWithOptionalFieldsToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77084,7 +77504,7 @@ function SaveTransactionWithOptionalFieldsToJSON(value) {
         'subtransactions': value['subtransactions'] == null ? undefined : (value['subtransactions'].map(SaveSubTransaction_1.SaveSubTransactionToJSON)),
     };
 }
-exports.SaveTransactionWithOptionalFieldsToJSON = SaveTransactionWithOptionalFieldsToJSON;
+exports.SaveTransactionWithOptionalFieldsToJSONTyped = SaveTransactionWithOptionalFieldsToJSONTyped;
 
 
 /***/ }),
@@ -77103,7 +77523,7 @@ exports.SaveTransactionWithOptionalFieldsToJSON = SaveTransactionWithOptionalFie
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveTransactionsResponseToJSON = exports.SaveTransactionsResponseFromJSONTyped = exports.SaveTransactionsResponseFromJSON = exports.instanceOfSaveTransactionsResponse = void 0;
+exports.SaveTransactionsResponseToJSONTyped = exports.SaveTransactionsResponseToJSON = exports.SaveTransactionsResponseFromJSONTyped = exports.SaveTransactionsResponseFromJSON = exports.instanceOfSaveTransactionsResponse = void 0;
 const SaveTransactionsResponseData_1 = __nccwpck_require__(8125);
 /**
  * Check if a given object implements the SaveTransactionsResponse interface.
@@ -77127,7 +77547,11 @@ function SaveTransactionsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveTransactionsResponseFromJSONTyped = SaveTransactionsResponseFromJSONTyped;
-function SaveTransactionsResponseToJSON(value) {
+function SaveTransactionsResponseToJSON(json) {
+    return SaveTransactionsResponseToJSONTyped(json, false);
+}
+exports.SaveTransactionsResponseToJSON = SaveTransactionsResponseToJSON;
+function SaveTransactionsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77135,7 +77559,7 @@ function SaveTransactionsResponseToJSON(value) {
         'data': (0, SaveTransactionsResponseData_1.SaveTransactionsResponseDataToJSON)(value['data']),
     };
 }
-exports.SaveTransactionsResponseToJSON = SaveTransactionsResponseToJSON;
+exports.SaveTransactionsResponseToJSONTyped = SaveTransactionsResponseToJSONTyped;
 
 
 /***/ }),
@@ -77154,7 +77578,7 @@ exports.SaveTransactionsResponseToJSON = SaveTransactionsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SaveTransactionsResponseDataToJSON = exports.SaveTransactionsResponseDataFromJSONTyped = exports.SaveTransactionsResponseDataFromJSON = exports.instanceOfSaveTransactionsResponseData = void 0;
+exports.SaveTransactionsResponseDataToJSONTyped = exports.SaveTransactionsResponseDataToJSON = exports.SaveTransactionsResponseDataFromJSONTyped = exports.SaveTransactionsResponseDataFromJSON = exports.instanceOfSaveTransactionsResponseData = void 0;
 const TransactionDetail_1 = __nccwpck_require__(5029);
 /**
  * Check if a given object implements the SaveTransactionsResponseData interface.
@@ -77184,7 +77608,11 @@ function SaveTransactionsResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SaveTransactionsResponseDataFromJSONTyped = SaveTransactionsResponseDataFromJSONTyped;
-function SaveTransactionsResponseDataToJSON(value) {
+function SaveTransactionsResponseDataToJSON(json) {
+    return SaveTransactionsResponseDataToJSONTyped(json, false);
+}
+exports.SaveTransactionsResponseDataToJSON = SaveTransactionsResponseDataToJSON;
+function SaveTransactionsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77196,7 +77624,7 @@ function SaveTransactionsResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.SaveTransactionsResponseDataToJSON = SaveTransactionsResponseDataToJSON;
+exports.SaveTransactionsResponseDataToJSONTyped = SaveTransactionsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -77215,7 +77643,7 @@ exports.SaveTransactionsResponseDataToJSON = SaveTransactionsResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledSubTransactionToJSON = exports.ScheduledSubTransactionFromJSONTyped = exports.ScheduledSubTransactionFromJSON = exports.instanceOfScheduledSubTransaction = void 0;
+exports.ScheduledSubTransactionToJSONTyped = exports.ScheduledSubTransactionToJSON = exports.ScheduledSubTransactionFromJSONTyped = exports.ScheduledSubTransactionFromJSON = exports.instanceOfScheduledSubTransaction = void 0;
 /**
  * Check if a given object implements the ScheduledSubTransaction interface.
  */
@@ -77245,13 +77673,19 @@ function ScheduledSubTransactionFromJSONTyped(json, ignoreDiscriminator) {
         'amount': json['amount'],
         'memo': json['memo'] == null ? undefined : json['memo'],
         'payee_id': json['payee_id'] == null ? undefined : json['payee_id'],
+        'payee_name': json['payee_name'] == null ? undefined : json['payee_name'],
         'category_id': json['category_id'] == null ? undefined : json['category_id'],
+        'category_name': json['category_name'] == null ? undefined : json['category_name'],
         'transfer_account_id': json['transfer_account_id'] == null ? undefined : json['transfer_account_id'],
         'deleted': json['deleted'],
     };
 }
 exports.ScheduledSubTransactionFromJSONTyped = ScheduledSubTransactionFromJSONTyped;
-function ScheduledSubTransactionToJSON(value) {
+function ScheduledSubTransactionToJSON(json) {
+    return ScheduledSubTransactionToJSONTyped(json, false);
+}
+exports.ScheduledSubTransactionToJSON = ScheduledSubTransactionToJSON;
+function ScheduledSubTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77261,12 +77695,14 @@ function ScheduledSubTransactionToJSON(value) {
         'amount': value['amount'],
         'memo': value['memo'],
         'payee_id': value['payee_id'],
+        'payee_name': value['payee_name'],
         'category_id': value['category_id'],
+        'category_name': value['category_name'],
         'transfer_account_id': value['transfer_account_id'],
         'deleted': value['deleted'],
     };
 }
-exports.ScheduledSubTransactionToJSON = ScheduledSubTransactionToJSON;
+exports.ScheduledSubTransactionToJSONTyped = ScheduledSubTransactionToJSONTyped;
 
 
 /***/ }),
@@ -77285,7 +77721,7 @@ exports.ScheduledSubTransactionToJSON = ScheduledSubTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionDetailToJSON = exports.ScheduledTransactionDetailFromJSONTyped = exports.ScheduledTransactionDetailFromJSON = exports.instanceOfScheduledTransactionDetail = exports.ScheduledTransactionDetailFrequencyEnum = void 0;
+exports.ScheduledTransactionDetailToJSONTyped = exports.ScheduledTransactionDetailToJSON = exports.ScheduledTransactionDetailFromJSONTyped = exports.ScheduledTransactionDetailFromJSON = exports.instanceOfScheduledTransactionDetail = exports.ScheduledTransactionDetailFrequencyEnum = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const ScheduledSubTransaction_1 = __nccwpck_require__(7177);
 /**
@@ -77360,7 +77796,11 @@ function ScheduledTransactionDetailFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ScheduledTransactionDetailFromJSONTyped = ScheduledTransactionDetailFromJSONTyped;
-function ScheduledTransactionDetailToJSON(value) {
+function ScheduledTransactionDetailToJSON(json) {
+    return ScheduledTransactionDetailToJSONTyped(json, false);
+}
+exports.ScheduledTransactionDetailToJSON = ScheduledTransactionDetailToJSON;
+function ScheduledTransactionDetailToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77384,7 +77824,7 @@ function ScheduledTransactionDetailToJSON(value) {
         'subtransactions': (value['subtransactions'].map(ScheduledSubTransaction_1.ScheduledSubTransactionToJSON)),
     };
 }
-exports.ScheduledTransactionDetailToJSON = ScheduledTransactionDetailToJSON;
+exports.ScheduledTransactionDetailToJSONTyped = ScheduledTransactionDetailToJSONTyped;
 
 
 /***/ }),
@@ -77403,7 +77843,7 @@ exports.ScheduledTransactionDetailToJSON = ScheduledTransactionDetailToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionFrequencyToJSON = exports.ScheduledTransactionFrequencyFromJSONTyped = exports.ScheduledTransactionFrequencyFromJSON = exports.instanceOfScheduledTransactionFrequency = exports.ScheduledTransactionFrequency = void 0;
+exports.ScheduledTransactionFrequencyToJSONTyped = exports.ScheduledTransactionFrequencyToJSON = exports.ScheduledTransactionFrequencyFromJSONTyped = exports.ScheduledTransactionFrequencyFromJSON = exports.instanceOfScheduledTransactionFrequency = exports.ScheduledTransactionFrequency = void 0;
 /**
  * The scheduled transaction frequency
  * @export
@@ -77446,6 +77886,10 @@ function ScheduledTransactionFrequencyToJSON(value) {
     return value;
 }
 exports.ScheduledTransactionFrequencyToJSON = ScheduledTransactionFrequencyToJSON;
+function ScheduledTransactionFrequencyToJSONTyped(value, ignoreDiscriminator) {
+    return value;
+}
+exports.ScheduledTransactionFrequencyToJSONTyped = ScheduledTransactionFrequencyToJSONTyped;
 
 
 /***/ }),
@@ -77464,7 +77908,7 @@ exports.ScheduledTransactionFrequencyToJSON = ScheduledTransactionFrequencyToJSO
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionResponseToJSON = exports.ScheduledTransactionResponseFromJSONTyped = exports.ScheduledTransactionResponseFromJSON = exports.instanceOfScheduledTransactionResponse = void 0;
+exports.ScheduledTransactionResponseToJSONTyped = exports.ScheduledTransactionResponseToJSON = exports.ScheduledTransactionResponseFromJSONTyped = exports.ScheduledTransactionResponseFromJSON = exports.instanceOfScheduledTransactionResponse = void 0;
 const ScheduledTransactionResponseData_1 = __nccwpck_require__(4764);
 /**
  * Check if a given object implements the ScheduledTransactionResponse interface.
@@ -77488,7 +77932,11 @@ function ScheduledTransactionResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ScheduledTransactionResponseFromJSONTyped = ScheduledTransactionResponseFromJSONTyped;
-function ScheduledTransactionResponseToJSON(value) {
+function ScheduledTransactionResponseToJSON(json) {
+    return ScheduledTransactionResponseToJSONTyped(json, false);
+}
+exports.ScheduledTransactionResponseToJSON = ScheduledTransactionResponseToJSON;
+function ScheduledTransactionResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77496,7 +77944,7 @@ function ScheduledTransactionResponseToJSON(value) {
         'data': (0, ScheduledTransactionResponseData_1.ScheduledTransactionResponseDataToJSON)(value['data']),
     };
 }
-exports.ScheduledTransactionResponseToJSON = ScheduledTransactionResponseToJSON;
+exports.ScheduledTransactionResponseToJSONTyped = ScheduledTransactionResponseToJSONTyped;
 
 
 /***/ }),
@@ -77515,7 +77963,7 @@ exports.ScheduledTransactionResponseToJSON = ScheduledTransactionResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionResponseDataToJSON = exports.ScheduledTransactionResponseDataFromJSONTyped = exports.ScheduledTransactionResponseDataFromJSON = exports.instanceOfScheduledTransactionResponseData = void 0;
+exports.ScheduledTransactionResponseDataToJSONTyped = exports.ScheduledTransactionResponseDataToJSON = exports.ScheduledTransactionResponseDataFromJSONTyped = exports.ScheduledTransactionResponseDataFromJSON = exports.instanceOfScheduledTransactionResponseData = void 0;
 const ScheduledTransactionDetail_1 = __nccwpck_require__(2354);
 /**
  * Check if a given object implements the ScheduledTransactionResponseData interface.
@@ -77539,7 +77987,11 @@ function ScheduledTransactionResponseDataFromJSONTyped(json, ignoreDiscriminator
     };
 }
 exports.ScheduledTransactionResponseDataFromJSONTyped = ScheduledTransactionResponseDataFromJSONTyped;
-function ScheduledTransactionResponseDataToJSON(value) {
+function ScheduledTransactionResponseDataToJSON(json) {
+    return ScheduledTransactionResponseDataToJSONTyped(json, false);
+}
+exports.ScheduledTransactionResponseDataToJSON = ScheduledTransactionResponseDataToJSON;
+function ScheduledTransactionResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77547,7 +77999,7 @@ function ScheduledTransactionResponseDataToJSON(value) {
         'scheduled_transaction': (0, ScheduledTransactionDetail_1.ScheduledTransactionDetailToJSON)(value['scheduled_transaction']),
     };
 }
-exports.ScheduledTransactionResponseDataToJSON = ScheduledTransactionResponseDataToJSON;
+exports.ScheduledTransactionResponseDataToJSONTyped = ScheduledTransactionResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -77566,7 +78018,7 @@ exports.ScheduledTransactionResponseDataToJSON = ScheduledTransactionResponseDat
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionSummaryToJSON = exports.ScheduledTransactionSummaryFromJSONTyped = exports.ScheduledTransactionSummaryFromJSON = exports.instanceOfScheduledTransactionSummary = exports.ScheduledTransactionSummaryFrequencyEnum = void 0;
+exports.ScheduledTransactionSummaryToJSONTyped = exports.ScheduledTransactionSummaryToJSON = exports.ScheduledTransactionSummaryFromJSONTyped = exports.ScheduledTransactionSummaryFromJSON = exports.instanceOfScheduledTransactionSummary = exports.ScheduledTransactionSummaryFrequencyEnum = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 /**
  * @export
@@ -77632,7 +78084,11 @@ function ScheduledTransactionSummaryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ScheduledTransactionSummaryFromJSONTyped = ScheduledTransactionSummaryFromJSONTyped;
-function ScheduledTransactionSummaryToJSON(value) {
+function ScheduledTransactionSummaryToJSON(json) {
+    return ScheduledTransactionSummaryToJSONTyped(json, false);
+}
+exports.ScheduledTransactionSummaryToJSON = ScheduledTransactionSummaryToJSON;
+function ScheduledTransactionSummaryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77652,7 +78108,7 @@ function ScheduledTransactionSummaryToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.ScheduledTransactionSummaryToJSON = ScheduledTransactionSummaryToJSON;
+exports.ScheduledTransactionSummaryToJSONTyped = ScheduledTransactionSummaryToJSONTyped;
 
 
 /***/ }),
@@ -77671,7 +78127,7 @@ exports.ScheduledTransactionSummaryToJSON = ScheduledTransactionSummaryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionsResponseToJSON = exports.ScheduledTransactionsResponseFromJSONTyped = exports.ScheduledTransactionsResponseFromJSON = exports.instanceOfScheduledTransactionsResponse = void 0;
+exports.ScheduledTransactionsResponseToJSONTyped = exports.ScheduledTransactionsResponseToJSON = exports.ScheduledTransactionsResponseFromJSONTyped = exports.ScheduledTransactionsResponseFromJSON = exports.instanceOfScheduledTransactionsResponse = void 0;
 const ScheduledTransactionsResponseData_1 = __nccwpck_require__(5125);
 /**
  * Check if a given object implements the ScheduledTransactionsResponse interface.
@@ -77695,7 +78151,11 @@ function ScheduledTransactionsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.ScheduledTransactionsResponseFromJSONTyped = ScheduledTransactionsResponseFromJSONTyped;
-function ScheduledTransactionsResponseToJSON(value) {
+function ScheduledTransactionsResponseToJSON(json) {
+    return ScheduledTransactionsResponseToJSONTyped(json, false);
+}
+exports.ScheduledTransactionsResponseToJSON = ScheduledTransactionsResponseToJSON;
+function ScheduledTransactionsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77703,7 +78163,7 @@ function ScheduledTransactionsResponseToJSON(value) {
         'data': (0, ScheduledTransactionsResponseData_1.ScheduledTransactionsResponseDataToJSON)(value['data']),
     };
 }
-exports.ScheduledTransactionsResponseToJSON = ScheduledTransactionsResponseToJSON;
+exports.ScheduledTransactionsResponseToJSONTyped = ScheduledTransactionsResponseToJSONTyped;
 
 
 /***/ }),
@@ -77722,7 +78182,7 @@ exports.ScheduledTransactionsResponseToJSON = ScheduledTransactionsResponseToJSO
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ScheduledTransactionsResponseDataToJSON = exports.ScheduledTransactionsResponseDataFromJSONTyped = exports.ScheduledTransactionsResponseDataFromJSON = exports.instanceOfScheduledTransactionsResponseData = void 0;
+exports.ScheduledTransactionsResponseDataToJSONTyped = exports.ScheduledTransactionsResponseDataToJSON = exports.ScheduledTransactionsResponseDataFromJSONTyped = exports.ScheduledTransactionsResponseDataFromJSON = exports.instanceOfScheduledTransactionsResponseData = void 0;
 const ScheduledTransactionDetail_1 = __nccwpck_require__(2354);
 /**
  * Check if a given object implements the ScheduledTransactionsResponseData interface.
@@ -77749,7 +78209,11 @@ function ScheduledTransactionsResponseDataFromJSONTyped(json, ignoreDiscriminato
     };
 }
 exports.ScheduledTransactionsResponseDataFromJSONTyped = ScheduledTransactionsResponseDataFromJSONTyped;
-function ScheduledTransactionsResponseDataToJSON(value) {
+function ScheduledTransactionsResponseDataToJSON(json) {
+    return ScheduledTransactionsResponseDataToJSONTyped(json, false);
+}
+exports.ScheduledTransactionsResponseDataToJSON = ScheduledTransactionsResponseDataToJSON;
+function ScheduledTransactionsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77758,7 +78222,7 @@ function ScheduledTransactionsResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.ScheduledTransactionsResponseDataToJSON = ScheduledTransactionsResponseDataToJSON;
+exports.ScheduledTransactionsResponseDataToJSONTyped = ScheduledTransactionsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -77777,7 +78241,7 @@ exports.ScheduledTransactionsResponseDataToJSON = ScheduledTransactionsResponseD
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SubTransactionToJSON = exports.SubTransactionFromJSONTyped = exports.SubTransactionFromJSON = exports.instanceOfSubTransaction = void 0;
+exports.SubTransactionToJSONTyped = exports.SubTransactionToJSON = exports.SubTransactionFromJSONTyped = exports.SubTransactionFromJSON = exports.instanceOfSubTransaction = void 0;
 /**
  * Check if a given object implements the SubTransaction interface.
  */
@@ -77816,7 +78280,11 @@ function SubTransactionFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.SubTransactionFromJSONTyped = SubTransactionFromJSONTyped;
-function SubTransactionToJSON(value) {
+function SubTransactionToJSON(json) {
+    return SubTransactionToJSONTyped(json, false);
+}
+exports.SubTransactionToJSON = SubTransactionToJSON;
+function SubTransactionToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -77834,7 +78302,7 @@ function SubTransactionToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.SubTransactionToJSON = SubTransactionToJSON;
+exports.SubTransactionToJSONTyped = SubTransactionToJSONTyped;
 
 
 /***/ }),
@@ -77853,7 +78321,7 @@ exports.SubTransactionToJSON = SubTransactionToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionClearedStatusToJSON = exports.TransactionClearedStatusFromJSONTyped = exports.TransactionClearedStatusFromJSON = exports.instanceOfTransactionClearedStatus = exports.TransactionClearedStatus = void 0;
+exports.TransactionClearedStatusToJSONTyped = exports.TransactionClearedStatusToJSON = exports.TransactionClearedStatusFromJSONTyped = exports.TransactionClearedStatusFromJSON = exports.instanceOfTransactionClearedStatus = exports.TransactionClearedStatus = void 0;
 /**
  * The cleared status of the transaction
  * @export
@@ -77886,6 +78354,10 @@ function TransactionClearedStatusToJSON(value) {
     return value;
 }
 exports.TransactionClearedStatusToJSON = TransactionClearedStatusToJSON;
+function TransactionClearedStatusToJSONTyped(value, ignoreDiscriminator) {
+    return value;
+}
+exports.TransactionClearedStatusToJSONTyped = TransactionClearedStatusToJSONTyped;
 
 
 /***/ }),
@@ -77904,7 +78376,7 @@ exports.TransactionClearedStatusToJSON = TransactionClearedStatusToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionDetailToJSON = exports.TransactionDetailFromJSONTyped = exports.TransactionDetailFromJSON = exports.instanceOfTransactionDetail = exports.TransactionDetailDebtTransactionTypeEnum = void 0;
+exports.TransactionDetailToJSONTyped = exports.TransactionDetailToJSON = exports.TransactionDetailFromJSONTyped = exports.TransactionDetailFromJSON = exports.instanceOfTransactionDetail = exports.TransactionDetailDebtTransactionTypeEnum = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 const SubTransaction_1 = __nccwpck_require__(5800);
@@ -77919,7 +78391,7 @@ exports.TransactionDetailDebtTransactionTypeEnum = {
     Escrow: 'escrow',
     BalanceAdjustment: 'balanceAdjustment',
     Credit: 'credit',
-    Charge: 'charge',
+    Charge: 'charge'
 };
 /**
  * Check if a given object implements the TransactionDetail interface.
@@ -77981,7 +78453,11 @@ function TransactionDetailFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionDetailFromJSONTyped = TransactionDetailFromJSONTyped;
-function TransactionDetailToJSON(value) {
+function TransactionDetailToJSON(json) {
+    return TransactionDetailToJSONTyped(json, false);
+}
+exports.TransactionDetailToJSON = TransactionDetailToJSON;
+function TransactionDetailToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78011,7 +78487,7 @@ function TransactionDetailToJSON(value) {
         'subtransactions': (value['subtransactions'].map(SubTransaction_1.SubTransactionToJSON)),
     };
 }
-exports.TransactionDetailToJSON = TransactionDetailToJSON;
+exports.TransactionDetailToJSONTyped = TransactionDetailToJSONTyped;
 
 
 /***/ }),
@@ -78030,7 +78506,7 @@ exports.TransactionDetailToJSON = TransactionDetailToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionFlagColorToJSON = exports.TransactionFlagColorFromJSONTyped = exports.TransactionFlagColorFromJSON = exports.instanceOfTransactionFlagColor = exports.TransactionFlagColor = void 0;
+exports.TransactionFlagColorToJSONTyped = exports.TransactionFlagColorToJSON = exports.TransactionFlagColorFromJSONTyped = exports.TransactionFlagColorFromJSON = exports.instanceOfTransactionFlagColor = exports.TransactionFlagColor = void 0;
 /**
  * The transaction flag
  * @export
@@ -78041,7 +78517,7 @@ exports.TransactionFlagColor = {
     Yellow: 'yellow',
     Green: 'green',
     Blue: 'blue',
-    Purple: 'purple',
+    Purple: 'purple'
 };
 function instanceOfTransactionFlagColor(value) {
     for (const key in exports.TransactionFlagColor) {
@@ -78066,6 +78542,10 @@ function TransactionFlagColorToJSON(value) {
     return value;
 }
 exports.TransactionFlagColorToJSON = TransactionFlagColorToJSON;
+function TransactionFlagColorToJSONTyped(value, ignoreDiscriminator) {
+    return value;
+}
+exports.TransactionFlagColorToJSONTyped = TransactionFlagColorToJSONTyped;
 
 
 /***/ }),
@@ -78084,7 +78564,7 @@ exports.TransactionFlagColorToJSON = TransactionFlagColorToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionResponseToJSON = exports.TransactionResponseFromJSONTyped = exports.TransactionResponseFromJSON = exports.instanceOfTransactionResponse = void 0;
+exports.TransactionResponseToJSONTyped = exports.TransactionResponseToJSON = exports.TransactionResponseFromJSONTyped = exports.TransactionResponseFromJSON = exports.instanceOfTransactionResponse = void 0;
 const TransactionResponseData_1 = __nccwpck_require__(8439);
 /**
  * Check if a given object implements the TransactionResponse interface.
@@ -78108,7 +78588,11 @@ function TransactionResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionResponseFromJSONTyped = TransactionResponseFromJSONTyped;
-function TransactionResponseToJSON(value) {
+function TransactionResponseToJSON(json) {
+    return TransactionResponseToJSONTyped(json, false);
+}
+exports.TransactionResponseToJSON = TransactionResponseToJSON;
+function TransactionResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78116,7 +78600,7 @@ function TransactionResponseToJSON(value) {
         'data': (0, TransactionResponseData_1.TransactionResponseDataToJSON)(value['data']),
     };
 }
-exports.TransactionResponseToJSON = TransactionResponseToJSON;
+exports.TransactionResponseToJSONTyped = TransactionResponseToJSONTyped;
 
 
 /***/ }),
@@ -78135,7 +78619,7 @@ exports.TransactionResponseToJSON = TransactionResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionResponseDataToJSON = exports.TransactionResponseDataFromJSONTyped = exports.TransactionResponseDataFromJSON = exports.instanceOfTransactionResponseData = void 0;
+exports.TransactionResponseDataToJSONTyped = exports.TransactionResponseDataToJSON = exports.TransactionResponseDataFromJSONTyped = exports.TransactionResponseDataFromJSON = exports.instanceOfTransactionResponseData = void 0;
 const TransactionDetail_1 = __nccwpck_require__(5029);
 /**
  * Check if a given object implements the TransactionResponseData interface.
@@ -78159,7 +78643,11 @@ function TransactionResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionResponseDataFromJSONTyped = TransactionResponseDataFromJSONTyped;
-function TransactionResponseDataToJSON(value) {
+function TransactionResponseDataToJSON(json) {
+    return TransactionResponseDataToJSONTyped(json, false);
+}
+exports.TransactionResponseDataToJSON = TransactionResponseDataToJSON;
+function TransactionResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78167,7 +78655,7 @@ function TransactionResponseDataToJSON(value) {
         'transaction': (0, TransactionDetail_1.TransactionDetailToJSON)(value['transaction']),
     };
 }
-exports.TransactionResponseDataToJSON = TransactionResponseDataToJSON;
+exports.TransactionResponseDataToJSONTyped = TransactionResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -78186,7 +78674,7 @@ exports.TransactionResponseDataToJSON = TransactionResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionSummaryToJSON = exports.TransactionSummaryFromJSONTyped = exports.TransactionSummaryFromJSON = exports.instanceOfTransactionSummary = exports.TransactionSummaryDebtTransactionTypeEnum = void 0;
+exports.TransactionSummaryToJSONTyped = exports.TransactionSummaryToJSON = exports.TransactionSummaryFromJSONTyped = exports.TransactionSummaryFromJSON = exports.instanceOfTransactionSummary = exports.TransactionSummaryDebtTransactionTypeEnum = void 0;
 const TransactionFlagColor_1 = __nccwpck_require__(7511);
 const TransactionClearedStatus_1 = __nccwpck_require__(628);
 /**
@@ -78200,7 +78688,7 @@ exports.TransactionSummaryDebtTransactionTypeEnum = {
     Escrow: 'escrow',
     BalanceAdjustment: 'balanceAdjustment',
     Credit: 'credit',
-    Charge: 'charge',
+    Charge: 'charge'
 };
 /**
  * Check if a given object implements the TransactionSummary interface.
@@ -78254,7 +78742,11 @@ function TransactionSummaryFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionSummaryFromJSONTyped = TransactionSummaryFromJSONTyped;
-function TransactionSummaryToJSON(value) {
+function TransactionSummaryToJSON(json) {
+    return TransactionSummaryToJSONTyped(json, false);
+}
+exports.TransactionSummaryToJSON = TransactionSummaryToJSON;
+function TransactionSummaryToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78280,7 +78772,7 @@ function TransactionSummaryToJSON(value) {
         'deleted': value['deleted'],
     };
 }
-exports.TransactionSummaryToJSON = TransactionSummaryToJSON;
+exports.TransactionSummaryToJSONTyped = TransactionSummaryToJSONTyped;
 
 
 /***/ }),
@@ -78299,7 +78791,7 @@ exports.TransactionSummaryToJSON = TransactionSummaryToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionsImportResponseToJSON = exports.TransactionsImportResponseFromJSONTyped = exports.TransactionsImportResponseFromJSON = exports.instanceOfTransactionsImportResponse = void 0;
+exports.TransactionsImportResponseToJSONTyped = exports.TransactionsImportResponseToJSON = exports.TransactionsImportResponseFromJSONTyped = exports.TransactionsImportResponseFromJSON = exports.instanceOfTransactionsImportResponse = void 0;
 const TransactionsImportResponseData_1 = __nccwpck_require__(9697);
 /**
  * Check if a given object implements the TransactionsImportResponse interface.
@@ -78323,7 +78815,11 @@ function TransactionsImportResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionsImportResponseFromJSONTyped = TransactionsImportResponseFromJSONTyped;
-function TransactionsImportResponseToJSON(value) {
+function TransactionsImportResponseToJSON(json) {
+    return TransactionsImportResponseToJSONTyped(json, false);
+}
+exports.TransactionsImportResponseToJSON = TransactionsImportResponseToJSON;
+function TransactionsImportResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78331,7 +78827,7 @@ function TransactionsImportResponseToJSON(value) {
         'data': (0, TransactionsImportResponseData_1.TransactionsImportResponseDataToJSON)(value['data']),
     };
 }
-exports.TransactionsImportResponseToJSON = TransactionsImportResponseToJSON;
+exports.TransactionsImportResponseToJSONTyped = TransactionsImportResponseToJSONTyped;
 
 
 /***/ }),
@@ -78350,7 +78846,7 @@ exports.TransactionsImportResponseToJSON = TransactionsImportResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionsImportResponseDataToJSON = exports.TransactionsImportResponseDataFromJSONTyped = exports.TransactionsImportResponseDataFromJSON = exports.instanceOfTransactionsImportResponseData = void 0;
+exports.TransactionsImportResponseDataToJSONTyped = exports.TransactionsImportResponseDataToJSON = exports.TransactionsImportResponseDataFromJSONTyped = exports.TransactionsImportResponseDataFromJSON = exports.instanceOfTransactionsImportResponseData = void 0;
 /**
  * Check if a given object implements the TransactionsImportResponseData interface.
  */
@@ -78373,7 +78869,11 @@ function TransactionsImportResponseDataFromJSONTyped(json, ignoreDiscriminator) 
     };
 }
 exports.TransactionsImportResponseDataFromJSONTyped = TransactionsImportResponseDataFromJSONTyped;
-function TransactionsImportResponseDataToJSON(value) {
+function TransactionsImportResponseDataToJSON(json) {
+    return TransactionsImportResponseDataToJSONTyped(json, false);
+}
+exports.TransactionsImportResponseDataToJSON = TransactionsImportResponseDataToJSON;
+function TransactionsImportResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78381,7 +78881,7 @@ function TransactionsImportResponseDataToJSON(value) {
         'transaction_ids': value['transaction_ids'],
     };
 }
-exports.TransactionsImportResponseDataToJSON = TransactionsImportResponseDataToJSON;
+exports.TransactionsImportResponseDataToJSONTyped = TransactionsImportResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -78400,7 +78900,7 @@ exports.TransactionsImportResponseDataToJSON = TransactionsImportResponseDataToJ
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionsResponseToJSON = exports.TransactionsResponseFromJSONTyped = exports.TransactionsResponseFromJSON = exports.instanceOfTransactionsResponse = void 0;
+exports.TransactionsResponseToJSONTyped = exports.TransactionsResponseToJSON = exports.TransactionsResponseFromJSONTyped = exports.TransactionsResponseFromJSON = exports.instanceOfTransactionsResponse = void 0;
 const TransactionsResponseData_1 = __nccwpck_require__(1516);
 /**
  * Check if a given object implements the TransactionsResponse interface.
@@ -78424,7 +78924,11 @@ function TransactionsResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionsResponseFromJSONTyped = TransactionsResponseFromJSONTyped;
-function TransactionsResponseToJSON(value) {
+function TransactionsResponseToJSON(json) {
+    return TransactionsResponseToJSONTyped(json, false);
+}
+exports.TransactionsResponseToJSON = TransactionsResponseToJSON;
+function TransactionsResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78432,7 +78936,7 @@ function TransactionsResponseToJSON(value) {
         'data': (0, TransactionsResponseData_1.TransactionsResponseDataToJSON)(value['data']),
     };
 }
-exports.TransactionsResponseToJSON = TransactionsResponseToJSON;
+exports.TransactionsResponseToJSONTyped = TransactionsResponseToJSONTyped;
 
 
 /***/ }),
@@ -78451,7 +78955,7 @@ exports.TransactionsResponseToJSON = TransactionsResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TransactionsResponseDataToJSON = exports.TransactionsResponseDataFromJSONTyped = exports.TransactionsResponseDataFromJSON = exports.instanceOfTransactionsResponseData = void 0;
+exports.TransactionsResponseDataToJSONTyped = exports.TransactionsResponseDataToJSON = exports.TransactionsResponseDataFromJSONTyped = exports.TransactionsResponseDataFromJSON = exports.instanceOfTransactionsResponseData = void 0;
 const TransactionDetail_1 = __nccwpck_require__(5029);
 /**
  * Check if a given object implements the TransactionsResponseData interface.
@@ -78478,7 +78982,11 @@ function TransactionsResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.TransactionsResponseDataFromJSONTyped = TransactionsResponseDataFromJSONTyped;
-function TransactionsResponseDataToJSON(value) {
+function TransactionsResponseDataToJSON(json) {
+    return TransactionsResponseDataToJSONTyped(json, false);
+}
+exports.TransactionsResponseDataToJSON = TransactionsResponseDataToJSON;
+function TransactionsResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78487,7 +78995,7 @@ function TransactionsResponseDataToJSON(value) {
         'server_knowledge': value['server_knowledge'],
     };
 }
-exports.TransactionsResponseDataToJSON = TransactionsResponseDataToJSON;
+exports.TransactionsResponseDataToJSONTyped = TransactionsResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -78506,7 +79014,7 @@ exports.TransactionsResponseDataToJSON = TransactionsResponseDataToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserToJSON = exports.UserFromJSONTyped = exports.UserFromJSON = exports.instanceOfUser = void 0;
+exports.UserToJSONTyped = exports.UserToJSON = exports.UserFromJSONTyped = exports.UserFromJSON = exports.instanceOfUser = void 0;
 /**
  * Check if a given object implements the User interface.
  */
@@ -78529,7 +79037,11 @@ function UserFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.UserFromJSONTyped = UserFromJSONTyped;
-function UserToJSON(value) {
+function UserToJSON(json) {
+    return UserToJSONTyped(json, false);
+}
+exports.UserToJSON = UserToJSON;
+function UserToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78537,7 +79049,7 @@ function UserToJSON(value) {
         'id': value['id'],
     };
 }
-exports.UserToJSON = UserToJSON;
+exports.UserToJSONTyped = UserToJSONTyped;
 
 
 /***/ }),
@@ -78556,7 +79068,7 @@ exports.UserToJSON = UserToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserResponseToJSON = exports.UserResponseFromJSONTyped = exports.UserResponseFromJSON = exports.instanceOfUserResponse = void 0;
+exports.UserResponseToJSONTyped = exports.UserResponseToJSON = exports.UserResponseFromJSONTyped = exports.UserResponseFromJSON = exports.instanceOfUserResponse = void 0;
 const UserResponseData_1 = __nccwpck_require__(3654);
 /**
  * Check if a given object implements the UserResponse interface.
@@ -78580,7 +79092,11 @@ function UserResponseFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.UserResponseFromJSONTyped = UserResponseFromJSONTyped;
-function UserResponseToJSON(value) {
+function UserResponseToJSON(json) {
+    return UserResponseToJSONTyped(json, false);
+}
+exports.UserResponseToJSON = UserResponseToJSON;
+function UserResponseToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78588,7 +79104,7 @@ function UserResponseToJSON(value) {
         'data': (0, UserResponseData_1.UserResponseDataToJSON)(value['data']),
     };
 }
-exports.UserResponseToJSON = UserResponseToJSON;
+exports.UserResponseToJSONTyped = UserResponseToJSONTyped;
 
 
 /***/ }),
@@ -78607,7 +79123,7 @@ exports.UserResponseToJSON = UserResponseToJSON;
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UserResponseDataToJSON = exports.UserResponseDataFromJSONTyped = exports.UserResponseDataFromJSON = exports.instanceOfUserResponseData = void 0;
+exports.UserResponseDataToJSONTyped = exports.UserResponseDataToJSON = exports.UserResponseDataFromJSONTyped = exports.UserResponseDataFromJSON = exports.instanceOfUserResponseData = void 0;
 const User_1 = __nccwpck_require__(2965);
 /**
  * Check if a given object implements the UserResponseData interface.
@@ -78631,7 +79147,11 @@ function UserResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     };
 }
 exports.UserResponseDataFromJSONTyped = UserResponseDataFromJSONTyped;
-function UserResponseDataToJSON(value) {
+function UserResponseDataToJSON(json) {
+    return UserResponseDataToJSONTyped(json, false);
+}
+exports.UserResponseDataToJSON = UserResponseDataToJSON;
+function UserResponseDataToJSONTyped(value, ignoreDiscriminator = false) {
     if (value == null) {
         return value;
     }
@@ -78639,7 +79159,7 @@ function UserResponseDataToJSON(value) {
         'user': (0, User_1.UserToJSON)(value['user']),
     };
 }
-exports.UserResponseDataToJSON = UserResponseDataToJSON;
+exports.UserResponseDataToJSONTyped = UserResponseDataToJSONTyped;
 
 
 /***/ }),
@@ -78724,6 +79244,7 @@ __exportStar(__nccwpck_require__(3780), exports);
 __exportStar(__nccwpck_require__(4630), exports);
 __exportStar(__nccwpck_require__(5398), exports);
 __exportStar(__nccwpck_require__(18), exports);
+__exportStar(__nccwpck_require__(2101), exports);
 __exportStar(__nccwpck_require__(1822), exports);
 __exportStar(__nccwpck_require__(9580), exports);
 __exportStar(__nccwpck_require__(6063), exports);
@@ -78766,7 +79287,7 @@ __exportStar(__nccwpck_require__(3654), exports);
 /***/ }),
 
 /***/ 633:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
@@ -78778,19 +79299,15 @@ __exportStar(__nccwpck_require__(3654), exports);
  *
  * Generated by: OpenAPI Generator (https://openapi-generator.tech)
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TextApiResponse = exports.BlobApiResponse = exports.VoidApiResponse = exports.JSONApiResponse = exports.canConsumeForm = exports.mapValues = exports.querystring = exports.exists = exports.COLLECTION_FORMATS = exports.RequiredError = exports.FetchError = exports.ResponseError = exports.BaseAPI = exports.DefaultConfig = exports.Configuration = exports.BASE_PATH = void 0;
-const fetch_ponyfill_1 = __importDefault(__nccwpck_require__(3035));
 // Polyfill fetch globally - this makes it easier to override with modules like fetch-mock.
-const fetchPonyfillInstance = (0, fetch_ponyfill_1.default)();
+const fetchPonyfill = __nccwpck_require__(3035)();
 if (!globalThis.fetch) {
-    globalThis.fetch = fetchPonyfillInstance.fetch;
-    globalThis.Response = fetchPonyfillInstance.Response;
-    globalThis.Headers = fetchPonyfillInstance.Headers;
-    globalThis.Request = fetchPonyfillInstance.Request;
+    globalThis.fetch = fetchPonyfill.fetch;
+    globalThis.Response = fetchPonyfill.Response;
+    globalThis.Headers = fetchPonyfill.Headers;
+    globalThis.Request = fetchPonyfill.Request;
 }
 exports.BASE_PATH = "https://api.ynab.com/v1".replace(/\/+$/, "");
 class Configuration {
@@ -78801,9 +79318,7 @@ class Configuration {
         this.configuration = configuration;
     }
     get basePath() {
-        return this.configuration.basePath != null
-            ? this.configuration.basePath
-            : exports.BASE_PATH;
+        return this.configuration.basePath != null ? this.configuration.basePath : exports.BASE_PATH;
     }
     get fetchApi() {
         return this.configuration.fetchApi;
@@ -78823,16 +79338,14 @@ class Configuration {
     get apiKey() {
         const apiKey = this.configuration.apiKey;
         if (apiKey) {
-            return typeof apiKey === "function" ? apiKey : () => apiKey;
+            return typeof apiKey === 'function' ? apiKey : () => apiKey;
         }
         return undefined;
     }
     get accessToken() {
         const accessToken = this.configuration.accessToken;
         if (accessToken) {
-            return typeof accessToken === "function"
-                ? accessToken
-                : async () => accessToken;
+            return typeof accessToken === 'function' ? accessToken : async () => accessToken;
         }
         return undefined;
     }
@@ -78855,11 +79368,10 @@ class BaseAPI {
             let fetchParams = { url, init };
             for (const middleware of this.middleware) {
                 if (middleware.pre) {
-                    fetchParams =
-                        (await middleware.pre({
-                            fetch: this.fetchApi,
-                            ...fetchParams,
-                        })) || fetchParams;
+                    fetchParams = await middleware.pre({
+                        fetch: this.fetchApi,
+                        ...fetchParams,
+                    }) || fetchParams;
                 }
             }
             let response = undefined;
@@ -78869,19 +79381,18 @@ class BaseAPI {
             catch (e) {
                 for (const middleware of this.middleware) {
                     if (middleware.onError) {
-                        response =
-                            (await middleware.onError({
-                                fetch: this.fetchApi,
-                                url: fetchParams.url,
-                                init: fetchParams.init,
-                                error: e,
-                                response: response ? response.clone() : undefined,
-                            })) || response;
+                        response = await middleware.onError({
+                            fetch: this.fetchApi,
+                            url: fetchParams.url,
+                            init: fetchParams.init,
+                            error: e,
+                            response: response ? response.clone() : undefined,
+                        }) || response;
                     }
                 }
                 if (response === undefined) {
                     if (e instanceof Error) {
-                        throw new FetchError(e, "The request failed and the interceptors did not return an alternative response");
+                        throw new FetchError(e, 'The request failed and the interceptors did not return an alternative response');
                     }
                     else {
                         throw e;
@@ -78890,13 +79401,12 @@ class BaseAPI {
             }
             for (const middleware of this.middleware) {
                 if (middleware.post) {
-                    response =
-                        (await middleware.post({
-                            fetch: this.fetchApi,
-                            url: fetchParams.url,
-                            init: fetchParams.init,
-                            response: response.clone(),
-                        })) || response;
+                    response = await middleware.post({
+                        fetch: this.fetchApi,
+                        url: fetchParams.url,
+                        init: fetchParams.init,
+                        response: response.clone(),
+                    }) || response;
                 }
             }
             return response;
@@ -78935,7 +79445,7 @@ class BaseAPI {
     async request(context, initOverrides) {
         const { url, init } = await this.createFetchParams(context, initOverrides);
         const response = await this.fetchApi(url, init);
-        if (response && response.status >= 200 && response.status < 300) {
+        if (response && (response.status >= 200 && response.status < 300)) {
             return response;
         }
         else {
@@ -78944,15 +79454,14 @@ class BaseAPI {
     }
     async createFetchParams(context, initOverrides) {
         let url = this.configuration.basePath + context.path;
-        if (context.query !== undefined &&
-            Object.keys(context.query).length !== 0) {
+        if (context.query !== undefined && Object.keys(context.query).length !== 0) {
             // only add the querystring to the URL if there are query parameters.
             // this is done to avoid urls ending with a "?" character which buggy webservers
             // do not handle correctly sometimes.
-            url += "?" + this.configuration.queryParamsStringify(context.query);
+            url += '?' + this.configuration.queryParamsStringify(context.query);
         }
         const headers = Object.assign({}, this.configuration.headers, context.headers);
-        Object.keys(headers).forEach((key) => headers[key] === undefined ? delete headers[key] : {});
+        Object.keys(headers).forEach(key => headers[key] === undefined ? delete headers[key] : {});
         const initOverrideFn = typeof initOverrides === "function"
             ? initOverrides
             : async () => initOverrides;
@@ -78967,15 +79476,15 @@ class BaseAPI {
             ...(await initOverrideFn({
                 init: initParams,
                 context,
-            })),
+            }))
         };
         let body;
-        if (isFormData(overriddenInit.body) ||
-            overriddenInit.body instanceof URLSearchParams ||
-            isBlob(overriddenInit.body)) {
+        if (isFormData(overriddenInit.body)
+            || (overriddenInit.body instanceof URLSearchParams)
+            || isBlob(overriddenInit.body)) {
             body = overriddenInit.body;
         }
-        else if (this.isJsonMime(headers["Content-Type"])) {
+        else if (this.isJsonMime(headers['Content-Type'])) {
             body = JSON.stringify(overriddenInit.body);
         }
         else {
@@ -78983,7 +79492,7 @@ class BaseAPI {
         }
         const init = {
             ...overriddenInit,
-            body,
+            body
         };
         return { url, init };
     }
@@ -78999,9 +79508,10 @@ class BaseAPI {
     }
 }
 exports.BaseAPI = BaseAPI;
-BaseAPI.jsonRegex = new RegExp("^(:?application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$", "i");
+BaseAPI.jsonRegex = new RegExp('^(:?application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$', 'i');
+;
 function isBlob(value) {
-    return typeof Blob !== "undefined" && value instanceof Blob;
+    return typeof Blob !== 'undefined' && value instanceof Blob;
 }
 function isFormData(value) {
     return typeof FormData !== "undefined" && value instanceof FormData;
@@ -79041,18 +79551,17 @@ function exists(json, key) {
     return value !== null && value !== undefined;
 }
 exports.exists = exists;
-function querystring(params, prefix = "") {
+function querystring(params, prefix = '') {
     return Object.keys(params)
-        .map((key) => querystringSingleKey(key, params[key], prefix))
-        .filter((part) => part.length > 0)
-        .join("&");
+        .map(key => querystringSingleKey(key, params[key], prefix))
+        .filter(part => part.length > 0)
+        .join('&');
 }
 exports.querystring = querystring;
-function querystringSingleKey(key, value, keyPrefix = "") {
+function querystringSingleKey(key, value, keyPrefix = '') {
     const fullKey = keyPrefix + (keyPrefix.length ? `[${key}]` : key);
     if (value instanceof Array) {
-        const multiValue = value
-            .map((singleValue) => encodeURIComponent(String(singleValue)))
+        const multiValue = value.map(singleValue => encodeURIComponent(String(singleValue)))
             .join(`&${encodeURIComponent(fullKey)}=`);
         return `${encodeURIComponent(fullKey)}=${multiValue}`;
     }
@@ -79074,7 +79583,7 @@ function mapValues(data, fn) {
 exports.mapValues = mapValues;
 function canConsumeForm(consumes) {
     for (const consume of consumes) {
-        if ("multipart/form-data" === consume.contentType) {
+        if ('multipart/form-data' === consume.contentType) {
             return true;
         }
     }
@@ -79107,6 +79616,7 @@ class BlobApiResponse {
     async value() {
         return await this.raw.blob();
     }
+    ;
 }
 exports.BlobApiResponse = BlobApiResponse;
 class TextApiResponse {
@@ -79116,6 +79626,7 @@ class TextApiResponse {
     async value() {
         return await this.raw.text();
     }
+    ;
 }
 exports.TextApiResponse = TextApiResponse;
 
