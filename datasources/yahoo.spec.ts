@@ -15,8 +15,8 @@ describe("yahoo markets", () => {
 
     describe("getStockData", () => {
         it("should return data for a stock", async () => {
-            const data = await yahoo.getStockData("HCP")
-            assert.equal(data.symbol, "HCP", "it should return the correct company symbol")
+            const data = await yahoo.getStockData("MSFT")
+            assert.equal(data.symbol, "MSFT", "it should return the correct company symbol")
             assert.equal(data.currency, "USD", "it should return the correct data")
             assert.ok(data.price, "it should return a current price")
         })

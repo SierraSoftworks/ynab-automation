@@ -3,12 +3,11 @@ import {buildUrl, fetchSafe, retry} from "../utils/http"
 import {CurrencyDataSource, DataSource, StockDataSource} from "./datasource"
 
 const validUserAgents = [
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.1; rv:109.0) Gecko/20100101 Firefox/120.0",
-    "Mozilla/5.0 (X11; Linux i686; rv:109.0) Gecko/20100101 Firefox/120.0"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.7; rv:138.0) Gecko/20100101 Firefox/138.0",
+    "Mozilla/5.0 (X11; Linux i686; rv:138.0) Gecko/20100101 Firefox/138.0"
 ]
 
 export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSource {
@@ -61,7 +60,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
                 })
             })
 
-            if (response.status >= 400) {
+            if (response.status === 401) {
                 // Ensure that we re-initialize these values on the next attempt
                 this.cookie = this.crumb = null
             }
@@ -84,7 +83,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
                 })
             })
 
-            if (response.status >= 400) {
+            if (response.status === 401) {
                 // Ensure that we re-initialize these values on the next attempt
                 this.cookie = this.crumb = null
             }
@@ -109,34 +108,32 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
     }
 
     private async getSessionCookie(): Promise<string> {
-        return await retry(async () => {
-            const resp = await fetch("https://fc.yahoo.com", {
-                headers: this.headers,
-                redirect: "follow"
-            })
-
-            const cookie = resp.headers.get("set-cookie").split(";")[0] || ""
-            if (!cookie) throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`)
-
-            return cookie
+        const resp = await fetch("https://fc.yahoo.com", {
+            method: "GET",
+            headers: this.headers,
+            redirect: "follow"
         })
+
+        const cookie = resp.headers.get("set-cookie").split(";")[0] || ""
+        if (!cookie) throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`)
+
+        return cookie
     }
 
     private async getSessionCrumb(sessionCookie: string): Promise<string> {
-        return await retry(async () => {
-            const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-                headers: Object.assign({}, this.headers, {
-                    "Cookie": sessionCookie
-                }),
-                redirect: "follow"
-            })
-
-            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
-
-            const crumb = response.text()
-            if ((await crumb).includes("<html>")) throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`)
-            return crumb    
+        const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
+            method: "GET",
+            headers: Object.assign({}, this.headers, {
+                "Cookie": sessionCookie
+            }),
+            redirect: "follow"
         })
+
+        if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+
+        const crumb = response.text()
+        if ((await crumb).includes("<html>")) throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`)
+        return crumb    
     }
 }
 

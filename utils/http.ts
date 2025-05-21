@@ -2,7 +2,11 @@ export function buildUrl(template: string, params: { [key: string]: string }): s
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''))
 }
 
-export async function retry<T>(action: () => Promise<T>, attempts: number = 3, delay: number = 500): Promise<T> {
+export async function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export async function retry<T>(action: () => Promise<T>, attempts: number = 2, delay: number = 100): Promise<T> {
     while (true) {
         attempts -= 1
 
@@ -10,13 +14,12 @@ export async function retry<T>(action: () => Promise<T>, attempts: number = 3, d
             return await action()
         } catch (e) {
             if (!attempts) {
+                console.error(e)
                 throw e
             }
         }
 
-        await new Promise<null>((resolve) => {
-            setTimeout(() => resolve(null), delay)
-        })
+        await sleep(delay)
     }
 }
 

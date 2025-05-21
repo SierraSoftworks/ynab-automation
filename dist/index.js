@@ -79687,32 +79687,24 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Automation = void 0;
 exports.buildAutomationMap = buildAutomationMap;
 class Automation {
+    api;
     constructor(api) {
         this.api = api;
     }
 }
 exports.Automation = Automation;
 function buildAutomationMap(automations) {
-    return automations.reduce((map, automation) => (Object.assign(Object.assign({}, map), { [automation.kind]: automation })), {});
+    return automations.reduce((map, automation) => ({ ...map, [automation.kind]: automation }), {});
 }
 
 
 /***/ }),
 
 /***/ 708:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ApproverAutomation = void 0;
 const automation_1 = __nccwpck_require__(4291);
@@ -79721,19 +79713,17 @@ class ApproverAutomation extends automation_1.Automation {
     get kind() {
         return "approve";
     }
-    run(budget, account, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const transactions = yield this.api.transactions.getTransactionsByAccount(budget.id, account.id);
-            const pendingTransactions = transactions.data.transactions.filter(t => this.shouldApproveTransaction(t, options));
-            if (!pendingTransactions.length) {
-                return;
-            }
-            yield this.api.transactions.updateTransactions(budget.id, {
-                transactions: pendingTransactions.map(t => ({
-                    id: t.id,
-                    approved: true
-                }))
-            });
+    async run(budget, account, options) {
+        const transactions = await this.api.transactions.getTransactionsByAccount(budget.id, account.id);
+        const pendingTransactions = transactions.data.transactions.filter(t => this.shouldApproveTransaction(t, options));
+        if (!pendingTransactions.length) {
+            return;
+        }
+        await this.api.transactions.updateTransactions(budget.id, {
+            transactions: pendingTransactions.map(t => ({
+                id: t.id,
+                approved: true
+            }))
         });
     }
     shouldApproveTransaction(transaction, options) {
@@ -79748,19 +79738,10 @@ exports.ApproverAutomation = ApproverAutomation;
 /***/ }),
 
 /***/ 3075:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BottomlessAutomation = void 0;
 const automation_1 = __nccwpck_require__(4291);
@@ -79768,20 +79749,18 @@ class BottomlessAutomation extends automation_1.Automation {
     get kind() {
         return "bottomless";
     }
-    run(budget, account, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (account.balance < -10) {
-                yield this.api.transactions.createTransaction(budget.id, {
-                    transaction: {
-                        account_id: account.id,
-                        amount: -account.balance,
-                        date: new Date().toISOString().split('T')[0],
-                        payee_name: options["name"] || "Bottomless Pit",
-                        approved: options["approved"] === "yes"
-                    }
-                });
-            }
-        });
+    async run(budget, account, options) {
+        if (account.balance < -10) {
+            await this.api.transactions.createTransaction(budget.id, {
+                transaction: {
+                    account_id: account.id,
+                    amount: -account.balance,
+                    date: new Date().toISOString().split('T')[0],
+                    payee_name: options["name"] || "Bottomless Pit",
+                    approved: options["approved"] === "yes"
+                }
+            });
+        }
     }
 }
 exports.BottomlessAutomation = BottomlessAutomation;
@@ -79790,19 +79769,10 @@ exports.BottomlessAutomation = BottomlessAutomation;
 /***/ }),
 
 /***/ 4546:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ReplicateAutomation = void 0;
 const automation_1 = __nccwpck_require__(4291);
@@ -79811,51 +79781,47 @@ class ReplicateAutomation extends automation_1.Automation {
     get kind() {
         return "replicate";
     }
-    run(budget, account, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const targetBudgetAccounts = yield this.api.accounts.getAccounts(options["to_budget"]);
-            const targetAccount = targetBudgetAccounts.data.accounts.find(a => a.name === options["to_account"]);
-            if (!targetAccount) {
-                throw new Error(`Could not find target account '${options["to_account"]}' in target budget '${options["to_budget"]}'`);
-            }
-            const sourceCategories = yield this.getCategoriesLookup(budget.id);
-            const targetCategories = this.reverseLookup(yield this.getCategoriesLookup(options["to_budget"]));
-            const transactions = yield this.api.transactions.getTransactionsByAccount(budget.id, account.id);
-            const pendingTransactions = transactions.data.transactions.filter(t => this.shouldReplicateTransaction(t, sourceCategories, options));
-            const sinceDate = pendingTransactions.map(t => t.date).sort()[0];
-            const replicatedTransactions = yield this.api.transactions.getTransactionsByAccount(options["to_budget"], targetAccount.id, sinceDate);
-            const replicatedTransactionIds = new Set(replicatedTransactions.data.transactions.map(t => t.import_id));
-            const diffTransactions = pendingTransactions.filter(t => !replicatedTransactionIds.has(t.import_id));
-            if (!diffTransactions.length) {
-                return;
-            }
-            yield this.api.transactions.createTransactions(options["to_budget"], {
-                transactions: diffTransactions.map(t => ({
-                    account_id: targetAccount.id,
-                    amount: t.amount,
-                    approved: true,
-                    date: t.date,
-                    import_id: t.import_id,
-                    flag_color: (options["to_flag"] ? options["to_flag"] : t.flag_color),
-                    payee_name: t.payee_name,
-                    memo: t.memo,
-                    cleared: t.cleared,
-                    category_id: targetCategories[options["to_category"] || sourceCategories[t.category_id]]
-                }))
-            });
+    async run(budget, account, options) {
+        const targetBudgetAccounts = await this.api.accounts.getAccounts(options["to_budget"]);
+        const targetAccount = targetBudgetAccounts.data.accounts.find(a => a.name === options["to_account"]);
+        if (!targetAccount) {
+            throw new Error(`Could not find target account '${options["to_account"]}' in target budget '${options["to_budget"]}'`);
+        }
+        const sourceCategories = await this.getCategoriesLookup(budget.id);
+        const targetCategories = this.reverseLookup(await this.getCategoriesLookup(options["to_budget"]));
+        const transactions = await this.api.transactions.getTransactionsByAccount(budget.id, account.id);
+        const pendingTransactions = transactions.data.transactions.filter(t => this.shouldReplicateTransaction(t, sourceCategories, options));
+        const sinceDate = pendingTransactions.map(t => t.date).sort()[0];
+        const replicatedTransactions = await this.api.transactions.getTransactionsByAccount(options["to_budget"], targetAccount.id, sinceDate);
+        const replicatedTransactionIds = new Set(replicatedTransactions.data.transactions.map(t => t.import_id));
+        const diffTransactions = pendingTransactions.filter(t => !replicatedTransactionIds.has(t.import_id));
+        if (!diffTransactions.length) {
+            return;
+        }
+        await this.api.transactions.createTransactions(options["to_budget"], {
+            transactions: diffTransactions.map(t => ({
+                account_id: targetAccount.id,
+                amount: t.amount,
+                approved: true,
+                date: t.date,
+                import_id: t.import_id,
+                flag_color: (options["to_flag"] ? options["to_flag"] : t.flag_color),
+                payee_name: t.payee_name,
+                memo: t.memo,
+                cleared: t.cleared,
+                category_id: targetCategories[options["to_category"] || sourceCategories[t.category_id]]
+            }))
         });
     }
-    getCategoriesLookup(budget_id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const categories = yield this.api.categories.getCategories(budget_id);
-            const lookup = {};
-            for (const category_group of categories.data.category_groups) {
-                for (const category of category_group.categories) {
-                    lookup[category.id] = this.getNormalizedCategoryName(category_group.name, category.name);
-                }
+    async getCategoriesLookup(budget_id) {
+        const categories = await this.api.categories.getCategories(budget_id);
+        const lookup = {};
+        for (const category_group of categories.data.category_groups) {
+            for (const category of category_group.categories) {
+                lookup[category.id] = this.getNormalizedCategoryName(category_group.name, category.name);
             }
-            return lookup;
-        });
+        }
+        return lookup;
     }
     reverseLookup(lookup) {
         const reversed = {};
@@ -79889,60 +79855,50 @@ exports.ReplicateAutomation = ReplicateAutomation;
 /***/ }),
 
 /***/ 6106:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StockChecker = exports.StockAutomation = void 0;
 const automation_1 = __nccwpck_require__(4291);
 const ynab_1 = __nccwpck_require__(1405);
 class StockAutomation extends automation_1.Automation {
+    currencies;
     constructor(api, stocks, currencies) {
         super(api);
         this.currencies = currencies;
         this.stockChecker = new StockChecker(stocks, currencies);
     }
+    stockChecker;
     get kind() {
         return "stocks";
     }
-    run(budget, account, options) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
-            const holdings = this.getStocks(options);
-            const values = yield this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code);
-            if (!values.length)
-                return;
-            const costBasis = yield this.getCurrencyValue(options.cost_basis || "0", budget.currency_format.iso_code);
-            const cgtRate = parseFloat(((_b = (_a = options.cgt_rate) === null || _a === void 0 ? void 0 : _a.replace('%', '')) === null || _b === void 0 ? void 0 : _b.trim()) || "0") / 100;
-            const net = StockAutomation.getNetValue(values, {
-                costBasis,
-                cgtRate
-            }) * 1000;
-            const shift = Math.floor(net - account.balance);
-            // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
-            if (Math.abs(shift) <= 1000)
-                return;
-            yield this.api.transactions.createTransaction(budget.id, {
-                transaction: {
-                    account_id: account.id,
-                    date: new Date().toISOString().split('T')[0],
-                    amount: shift,
-                    payee_name: options.payee_name || "Stock Market",
-                    cleared: ynab_1.TransactionClearedStatus.Cleared,
-                    approved: true,
-                    memo: values.map(v => `${v.symbol}: ${v.nativeCurrency} ${v.nativeValue.toFixed(2)} @ ${v.nativeCurrency} ${v.nativePrice}`).join(', ')
-                }
-            });
+    async run(budget, account, options) {
+        const holdings = this.getStocks(options);
+        const values = await this.stockChecker.getStockValues(holdings, budget.currency_format.iso_code);
+        if (!values.length)
+            return;
+        const costBasis = await this.getCurrencyValue(options.cost_basis || "0", budget.currency_format.iso_code);
+        const cgtRate = parseFloat(options.cgt_rate?.replace('%', '')?.trim() || "0") / 100;
+        const net = StockAutomation.getNetValue(values, {
+            costBasis,
+            cgtRate
+        }) * 1000;
+        const shift = Math.floor(net - account.balance);
+        // We only record transactions if they result in more than 1 unit of currency change (i.e. ignore changes in the cents range)
+        if (Math.abs(shift) <= 1000)
+            return;
+        await this.api.transactions.createTransaction(budget.id, {
+            transaction: {
+                account_id: account.id,
+                date: new Date().toISOString().split('T')[0],
+                amount: shift,
+                payee_name: options.payee_name || "Stock Market",
+                cleared: ynab_1.TransactionClearedStatus.Cleared,
+                approved: true,
+                memo: values.map(v => `${v.symbol}: ${v.nativeCurrency} ${v.nativeValue.toFixed(2)} @ ${v.nativeCurrency} ${v.nativePrice}`).join(', ')
+            }
         });
     }
     static getNetValue(stockValues, options) {
@@ -79956,68 +79912,60 @@ class StockAutomation extends automation_1.Automation {
             quantity: parseFloat(options[symbol]),
         }));
     }
-    getCurrencyValue(value, targetCurrency) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(?:\.\d+)?)$/);
-            const amount = parseFloat(amountSpec);
-            if (!currencySpec)
-                return amount;
-            const currencyRate = yield this.currencies.getCurrencyData(currencySpec, targetCurrency);
-            return amount * currencyRate;
-        });
+    async getCurrencyValue(value, targetCurrency) {
+        const [_, currencySpec, amountSpec] = value.match(/^([A-Z]*)(\d+(?:\.\d+)?)$/);
+        const amount = parseFloat(amountSpec);
+        if (!currencySpec)
+            return amount;
+        const currencyRate = await this.currencies.getCurrencyData(currencySpec, targetCurrency);
+        return amount * currencyRate;
     }
 }
 exports.StockAutomation = StockAutomation;
 class StockChecker {
+    stocks;
+    currencies;
     constructor(stocks, currencies) {
         this.stocks = stocks;
         this.currencies = currencies;
-        this.tickers = {};
-        this.rates = {};
     }
-    getTicker(symbol) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.tickers[symbol])
-                return this.tickers[symbol];
-            const ticker = yield this.stocks.getStockData(symbol);
-            return this.tickers[symbol] = {
-                currency: ticker.currency,
-                price: ticker.price
-            };
-        });
+    tickers = {};
+    rates = {};
+    async getTicker(symbol) {
+        if (this.tickers[symbol])
+            return this.tickers[symbol];
+        const ticker = await this.stocks.getStockData(symbol);
+        return this.tickers[symbol] = {
+            currency: ticker.currency,
+            price: ticker.price
+        };
     }
-    getRate(from, to) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (from === to)
-                return 1;
-            const conversion = `${from}:${to}`;
-            if (this.rates[conversion])
-                return this.rates[conversion];
-            const inverse = `${to}:${from}`;
-            const rate = yield this.currencies.getCurrencyData(from, to);
-            this.rates[inverse] = 1 / rate;
-            return this.rates[conversion] = rate;
-        });
+    async getRate(from, to) {
+        if (from === to)
+            return 1;
+        const conversion = `${from}:${to}`;
+        if (this.rates[conversion])
+            return this.rates[conversion];
+        const inverse = `${to}:${from}`;
+        const rate = await this.currencies.getCurrencyData(from, to);
+        this.rates[inverse] = 1 / rate;
+        return this.rates[conversion] = rate;
     }
-    getStockValue(holding, targetCurrency) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const ticker = yield this.getTicker(holding.symbol);
-            const rate = yield this.getRate(ticker.currency, targetCurrency);
-            const value = holding.quantity * ticker.price * rate;
-            return {
-                symbol: holding.symbol,
-                value,
-                nativeCurrency: ticker.currency,
-                nativeValue: holding.quantity * ticker.price,
-                price: ticker.price * rate,
-                nativePrice: ticker.price,
-            };
-        });
+    async getStockValue(holding, targetCurrency) {
+        const ticker = await this.getTicker(holding.symbol);
+        const rate = await this.getRate(ticker.currency, targetCurrency);
+        const value = holding.quantity * ticker.price * rate;
+        return {
+            symbol: holding.symbol,
+            value,
+            nativeCurrency: ticker.currency,
+            nativeValue: holding.quantity * ticker.price,
+            price: ticker.price * rate,
+            nativePrice: ticker.price,
+        };
     }
-    getStockValues(holdings, targetCurrency) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Promise.all(holdings.map(h => this.getStockValue(h, targetCurrency)));
-        });
+    async getStockValues(holdings, targetCurrency) {
+        return Promise.all(holdings.map(h => this.getStockValue(h, targetCurrency)));
     }
 }
 exports.StockChecker = StockChecker;
@@ -80026,69 +79974,59 @@ exports.StockChecker = StockChecker;
 /***/ }),
 
 /***/ 6398:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataSource = void 0;
 const fs = __nccwpck_require__(3024);
 const path = __nccwpck_require__(6760);
 const dayjs = __nccwpck_require__(3706);
 class DataSource {
+    id;
     constructor(id) {
         this.id = id;
-        this.cacheEnabled = true;
         this.cacheDirectory = path.join(DataSource.cacheDirectory, id);
     }
+    static cacheDirectory = ".ynab-cache";
+    cacheDirectory;
+    cacheEnabled = true;
     disableCache() {
         this.cacheEnabled = false;
     }
-    cleanCache() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const now = dayjs().unix();
-            if (!(yield fs.promises.stat(this.cacheDirectory)).isDirectory()) {
-                // If we can't hope to clean the cache, don't bother with the rest of this
-                return;
+    async cleanCache() {
+        const now = dayjs().unix();
+        if (!(await fs.promises.stat(this.cacheDirectory)).isDirectory()) {
+            // If we can't hope to clean the cache, don't bother with the rest of this
+            return;
+        }
+        const cacheFiles = await fs.promises.readdir(this.cacheDirectory);
+        const expiredFiles = cacheFiles.filter(f => !f.startsWith("forever-")).filter(f => {
+            try {
+                const expiry = parseInt(f.split("-")[0]);
+                return expiry < now;
             }
-            const cacheFiles = yield fs.promises.readdir(this.cacheDirectory);
-            const expiredFiles = cacheFiles.filter(f => !f.startsWith("forever-")).filter(f => {
-                try {
-                    const expiry = parseInt(f.split("-")[0]);
-                    return expiry < now;
-                }
-                catch (_a) {
-                    return false;
-                }
-            });
-            yield Promise.all(expiredFiles.map((f) => __awaiter(this, void 0, void 0, function* () {
-                yield fs.promises.rm(path.join(this.cacheDirectory, f));
-            })));
+            catch {
+                return false;
+            }
         });
+        await Promise.all(expiredFiles.map(async (f) => {
+            await fs.promises.rm(path.join(this.cacheDirectory, f));
+        }));
     }
-    cached(key, expiry, hydrate) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!this.cacheEnabled) {
-                return yield hydrate();
-            }
-            yield fs.promises.mkdir(this.cacheDirectory, { recursive: true });
-            const cachePath = this.getCachePath(key, expiry);
-            return yield fs.promises.readFile(cachePath, { encoding: "utf-8" })
-                .then(data => JSON.parse(data))
-                .catch(() => hydrate().then((data) => __awaiter(this, void 0, void 0, function* () {
-                yield fs.promises.writeFile(cachePath, JSON.stringify(data), { encoding: "utf-8" });
-                return data;
-            })));
-        });
+    async cached(key, expiry, hydrate) {
+        if (!this.cacheEnabled) {
+            return await hydrate();
+        }
+        await fs.promises.mkdir(this.cacheDirectory, { recursive: true });
+        const cachePath = this.getCachePath(key, expiry);
+        return await fs.promises.readFile(cachePath, { encoding: "utf-8" })
+            .then(data => JSON.parse(data))
+            .catch(() => hydrate().then(async (data) => {
+            await fs.promises.writeFile(cachePath, JSON.stringify(data), { encoding: "utf-8" });
+            return data;
+        }));
     }
     getCachePath(key, expiry = "never") {
         if (expiry === "never") {
@@ -80099,250 +80037,129 @@ class DataSource {
     }
 }
 exports.DataSource = DataSource;
-DataSource.cacheDirectory = ".ynab-cache";
 
 
 /***/ }),
 
 /***/ 3007:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Yahoo = void 0;
 const node_crypto_1 = __nccwpck_require__(7598);
 const http_1 = __nccwpck_require__(106);
 const datasource_1 = __nccwpck_require__(6398);
 const validUserAgents = [
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.1; rv:109.0) Gecko/20100101 Firefox/120.0",
-    "Mozilla/5.0 (X11; Linux i686; rv:109.0) Gecko/20100101 Firefox/120.0"
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14.7; rv:138.0) Gecko/20100101 Firefox/138.0",
+    "Mozilla/5.0 (X11; Linux i686; rv:138.0) Gecko/20100101 Firefox/138.0"
 ];
 class Yahoo extends datasource_1.DataSource {
     constructor() {
         super("yahoo");
-        this.headers = {
-            "Accept": "application/json, text/javascript, text/plain, */*; q=0.01",
-            "User-Agent": validUserAgents[(0, node_crypto_1.randomInt)(validUserAgents.length)],
+    }
+    headers = {
+        "Accept": "application/json, text/javascript, text/plain, */*; q=0.01",
+        "User-Agent": validUserAgents[(0, node_crypto_1.randomInt)(validUserAgents.length)],
+    };
+    cookie;
+    crumb;
+    async getStockData(symbol) {
+        const result = await this.cached(`stock-${symbol}`, "hour", () => this.getStockDataInternal(symbol));
+        return {
+            symbol: result.symbol,
+            currency: result.currency,
+            price: result.regularMarketPrice.raw
         };
     }
-    getStockData(symbol) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.cached(`stock-${symbol}`, "hour", () => this.getStockDataInternal(symbol));
-            return {
-                symbol: result.symbol,
-                currency: result.currency,
-                price: result.regularMarketPrice.raw
-            };
+    async getCurrencyData(from, to) {
+        from = from.toUpperCase();
+        to = to.toUpperCase();
+        const result = await this.cached(`currency-${from}-${to}`, "hour", () => this.getCurrencyDataInternal(from, to));
+        return result.regularMarketPrice.raw;
+    }
+    async getStockDataInternal(symbol) {
+        return await (0, http_1.retry)(async () => {
+            await this.ensureSessionCrumb();
+            const url = (0, http_1.buildUrl)(stockUrl, { SYMBOL: symbol, crumb: this.crumb });
+            const response = await fetch(url, {
+                headers: Object.assign({}, this.headers, {
+                    "Cookie": this.cookie
+                })
+            });
+            if (response.status === 401) {
+                // Ensure that we re-initialize these values on the next attempt
+                this.cookie = this.crumb = null;
+            }
+            if (!response.ok)
+                throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`);
+            const result = await response.json();
+            return result.quoteSummary.result[0].price;
         });
     }
-    getCurrencyData(from, to) {
-        return __awaiter(this, void 0, void 0, function* () {
-            from = from.toUpperCase();
-            to = to.toUpperCase();
-            const result = yield this.cached(`currency-${from}-${to}`, "hour", () => this.getCurrencyDataInternal(from, to));
-            return result.regularMarketPrice.raw;
+    async getCurrencyDataInternal(from, to) {
+        return await (0, http_1.retry)(async () => {
+            await this.ensureSessionCrumb();
+            const url = (0, http_1.buildUrl)(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb });
+            const response = await fetch(url, {
+                headers: Object.assign({}, this.headers, {
+                    "Cookie": this.cookie
+                })
+            });
+            if (response.status === 401) {
+                // Ensure that we re-initialize these values on the next attempt
+                this.cookie = this.crumb = null;
+            }
+            if (!response.ok)
+                throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`);
+            const result = await response.json();
+            return result.quoteSummary.result[0].price;
         });
     }
-    getStockDataInternal(symbol) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
-                yield this.ensureSessionCrumb();
-                const url = (0, http_1.buildUrl)(stockUrl, { SYMBOL: symbol, crumb: this.crumb });
-                const response = yield fetch(url, {
-                    headers: Object.assign({}, this.headers, {
-                        "Cookie": this.cookie
-                    })
-                });
-                if (response.status >= 400) {
-                    // Ensure that we re-initialize these values on the next attempt
-                    this.cookie = this.crumb = null;
-                }
-                if (!response.ok)
-                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
-                const result = yield response.json();
-                return result.quoteSummary.result[0].price;
-            }));
-        });
+    async ensureSessionCrumb() {
+        if (this.crumb)
+            return;
+        this.cookie = await this.getSessionCookie();
+        if (!this.cookie)
+            throw new Error("Failed to get session cookie");
+        this.crumb = await this.getSessionCrumb(this.cookie);
+        if (!this.crumb)
+            throw new Error("Failed to get session crumb");
     }
-    getCurrencyDataInternal(from, to) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
-                yield this.ensureSessionCrumb();
-                const url = (0, http_1.buildUrl)(currencyUrl, { FROM_SYMBOL: from, TO_SYMBOL: to, crumb: this.crumb });
-                const response = yield fetch(url, {
-                    headers: Object.assign({}, this.headers, {
-                        "Cookie": this.cookie
-                    })
-                });
-                if (response.status >= 400) {
-                    // Ensure that we re-initialize these values on the next attempt
-                    this.cookie = this.crumb = null;
-                }
-                if (!response.ok)
-                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
-                const result = yield response.json();
-                return result.quoteSummary.result[0].price;
-            }));
+    async getSessionCookie() {
+        const resp = await fetch("https://fc.yahoo.com", {
+            method: "GET",
+            headers: this.headers,
+            redirect: "follow"
         });
+        const cookie = resp.headers.get("set-cookie").split(";")[0] || "";
+        if (!cookie)
+            throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`);
+        return cookie;
     }
-    ensureSessionCrumb() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.crumb)
-                return;
-            this.cookie = yield this.getSessionCookie();
-            if (!this.cookie)
-                throw new Error("Failed to get session cookie");
-            this.crumb = yield this.getSessionCrumb(this.cookie);
-            if (!this.crumb)
-                throw new Error("Failed to get session crumb");
+    async getSessionCrumb(sessionCookie) {
+        const response = await fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
+            method: "GET",
+            headers: Object.assign({}, this.headers, {
+                "Cookie": sessionCookie
+            }),
+            redirect: "follow"
         });
-    }
-    getSessionCookie() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
-                const resp = yield fetch("https://fc.yahoo.com", {
-                    headers: this.headers,
-                    redirect: "follow"
-                });
-                const cookie = resp.headers.get("set-cookie").split(";")[0] || "";
-                if (!cookie)
-                    throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`);
-                return cookie;
-            }));
-        });
-    }
-    getSessionCrumb(sessionCookie) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield (0, http_1.retry)(() => __awaiter(this, void 0, void 0, function* () {
-                const response = yield fetch("https://query1.finance.yahoo.com/v1/test/getcrumb", {
-                    headers: Object.assign({}, this.headers, {
-                        "Cookie": sessionCookie
-                    }),
-                    redirect: "follow"
-                });
-                if (!response.ok)
-                    throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
-                const crumb = response.text();
-                if ((yield crumb).includes("<html>"))
-                    throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`);
-                return crumb;
-            }));
-        });
+        if (!response.ok)
+            throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`);
+        const crumb = response.text();
+        if ((await crumb).includes("<html>"))
+            throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`);
+        return crumb;
     }
 }
 exports.Yahoo = Yahoo;
 const stockUrl = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/{SYMBOL}?modules=price&crumb={crumb}";
 const currencyUrl = "https://query1.finance.yahoo.com/v10/finance/quoteSummary/{FROM_SYMBOL}{TO_SYMBOL}=X?modules=price&crumb={crumb}";
-
-
-/***/ }),
-
-/***/ 98:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const ynab = __nccwpck_require__(1405);
-const core = __nccwpck_require__(7484);
-const cache = __nccwpck_require__(5116);
-const automation_1 = __nccwpck_require__(4291);
-const parsers_1 = __nccwpck_require__(8866);
-const approve_1 = __nccwpck_require__(708);
-const bottomless_1 = __nccwpck_require__(3075);
-const replicate_1 = __nccwpck_require__(4546);
-const stocks_1 = __nccwpck_require__(6106);
-const yahoo_1 = __nccwpck_require__(3007);
-const datasource_1 = __nccwpck_require__(6398);
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const cacheEnabled = core.getBooleanInput("cache", { required: false });
-        try {
-            const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true });
-            const api = new ynab.API(apiKey);
-            if (cacheEnabled) {
-                yield cache.restoreCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
-            }
-            const yahoo = new yahoo_1.Yahoo();
-            if (cacheEnabled) {
-                core.debug("Removing old entries from the cache");
-                try {
-                    yield yahoo.cleanCache();
-                }
-                catch (err) {
-                    core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)");
-                    core.warning(err);
-                }
-            }
-            const automations = (0, automation_1.buildAutomationMap)([
-                new approve_1.ApproverAutomation(api),
-                new bottomless_1.BottomlessAutomation(api),
-                new replicate_1.ReplicateAutomation(api),
-                new stocks_1.StockAutomation(api, yahoo, yahoo),
-            ]);
-            const budgetId = core.getInput("budget-id", { trimWhitespace: true, required: false }) || "default";
-            const budget = yield api.budgets.getBudgetById(budgetId);
-            const accounts = yield api.accounts.getAccounts(budget.data.budget.id);
-            yield Promise.all(accounts.data.accounts.map((account) => __awaiter(this, void 0, void 0, function* () {
-                const triggers = (0, parsers_1.parse)(account.note || "");
-                if (!triggers.length)
-                    return;
-                yield Promise.all(triggers.map((trigger) => __awaiter(this, void 0, void 0, function* () {
-                    const automation = automations[trigger.kind];
-                    if (!automation) {
-                        core.error(`Unknown automation kind '${trigger.kind}' in account '${account.name}'`);
-                        return;
-                    }
-                    core.info(`Running automation '${automation.kind}' in account '${account.name}'`);
-                    try {
-                        yield automation.run(budget.data.budget, account, trigger.options);
-                        core.info(`Finished running automation '${automation.kind}' in account '${account.name}'`);
-                    }
-                    catch (err) {
-                        core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`);
-                        core.error(err);
-                        throw err;
-                    }
-                })));
-            })));
-            core.setOutput("success", true);
-        }
-        catch (err) {
-            core.debug(err.message);
-            core.debug(err.stack);
-            core.setFailed(err);
-        }
-        finally {
-            if (cacheEnabled) {
-                yield cache.saveCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
-            }
-        }
-    });
-}
-run();
 
 
 /***/ }),
@@ -80413,54 +80230,44 @@ function isStocksTrigger(trigger) {
 /***/ }),
 
 /***/ 106:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.buildUrl = buildUrl;
+exports.sleep = sleep;
 exports.retry = retry;
 exports.fetchSafe = fetchSafe;
 function buildUrl(template, params) {
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''));
 }
-function retry(action_1) {
-    return __awaiter(this, arguments, void 0, function* (action, attempts = 3, delay = 500) {
-        while (true) {
-            attempts -= 1;
-            try {
-                return yield action();
-            }
-            catch (e) {
-                if (!attempts) {
-                    throw e;
-                }
-            }
-            yield new Promise((resolve) => {
-                setTimeout(() => resolve(null), delay);
-            });
-        }
-    });
+async function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
-function fetchSafe(url_1) {
-    return __awaiter(this, arguments, void 0, function* (url, options = {}, attempts = 3) {
-        return yield retry(() => __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch(url, options);
-            if (!response.ok) {
-                throw new Error(`${response.status} ${response.statusText}: ${yield response.text()}`);
+async function retry(action, attempts = 2, delay = 100) {
+    while (true) {
+        attempts -= 1;
+        try {
+            return await action();
+        }
+        catch (e) {
+            if (!attempts) {
+                console.error(e);
+                throw e;
             }
-            return yield response.json();
-        }), attempts);
-    });
+        }
+        await sleep(delay);
+    }
+}
+async function fetchSafe(url, options = {}, attempts = 3) {
+    return await retry(async () => {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`);
+        }
+        return await response.json();
+    }, attempts);
 }
 
 
@@ -91475,12 +91282,91 @@ module.exports = /*#__PURE__*/JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(98);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const ynab = __nccwpck_require__(1405);
+const core = __nccwpck_require__(7484);
+const cache = __nccwpck_require__(5116);
+const automation_1 = __nccwpck_require__(4291);
+const parsers_1 = __nccwpck_require__(8866);
+const approve_1 = __nccwpck_require__(708);
+const bottomless_1 = __nccwpck_require__(3075);
+const replicate_1 = __nccwpck_require__(4546);
+const stocks_1 = __nccwpck_require__(6106);
+const yahoo_1 = __nccwpck_require__(3007);
+const datasource_1 = __nccwpck_require__(6398);
+async function run() {
+    const cacheEnabled = core.getBooleanInput("cache", { required: false });
+    try {
+        const apiKey = core.getInput("api-key", { trimWhitespace: true, required: true });
+        const api = new ynab.API(apiKey);
+        if (cacheEnabled) {
+            await cache.restoreCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
+        }
+        const yahoo = new yahoo_1.Yahoo();
+        if (cacheEnabled) {
+            core.debug("Removing old entries from the cache");
+            try {
+                await yahoo.cleanCache();
+            }
+            catch (err) {
+                core.warning("Failed to clean cache, proceeding with current state (this shouldn't cause any problems)");
+                core.warning(err);
+            }
+        }
+        const automations = (0, automation_1.buildAutomationMap)([
+            new approve_1.ApproverAutomation(api),
+            new bottomless_1.BottomlessAutomation(api),
+            new replicate_1.ReplicateAutomation(api),
+            new stocks_1.StockAutomation(api, yahoo, yahoo),
+        ]);
+        const budgetId = core.getInput("budget-id", { trimWhitespace: true, required: false }) || "default";
+        const budget = await api.budgets.getBudgetById(budgetId);
+        const accounts = await api.accounts.getAccounts(budget.data.budget.id);
+        await Promise.all(accounts.data.accounts.map(async (account) => {
+            const triggers = (0, parsers_1.parse)(account.note || "");
+            if (!triggers.length)
+                return;
+            await Promise.all(triggers.map(async (trigger) => {
+                const automation = automations[trigger.kind];
+                if (!automation) {
+                    core.error(`Unknown automation kind '${trigger.kind}' in account '${account.name}'`);
+                    return;
+                }
+                core.info(`Running automation '${automation.kind}' in account '${account.name}'`);
+                try {
+                    await automation.run(budget.data.budget, account, trigger.options);
+                    core.info(`Finished running automation '${automation.kind}' in account '${account.name}'`);
+                }
+                catch (err) {
+                    core.error(`Failed to run automation '${automation.kind}' in account '${account.name}'`);
+                    core.error(err);
+                    throw err;
+                }
+            }));
+        }));
+        core.setOutput("success", true);
+    }
+    catch (err) {
+        core.debug(err.message);
+        core.debug(err.stack);
+        core.setFailed(err);
+    }
+    finally {
+        if (cacheEnabled) {
+            await cache.saveCache([datasource_1.DataSource.cacheDirectory], "ynab-cache");
+        }
+    }
+}
+run();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
