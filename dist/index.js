@@ -74360,6 +74360,7 @@ function CategoryFromJSONTyped(json, ignoreDiscriminator) {
         'goal_under_funded': json['goal_under_funded'] == null ? undefined : json['goal_under_funded'],
         'goal_overall_funded': json['goal_overall_funded'] == null ? undefined : json['goal_overall_funded'],
         'goal_overall_left': json['goal_overall_left'] == null ? undefined : json['goal_overall_left'],
+        'goal_snoozed_at': json['goal_snoozed_at'] == null ? undefined : json['goal_snoozed_at'],
         'deleted': json['deleted'],
     };
 }
@@ -74396,6 +74397,7 @@ function CategoryToJSONTyped(value, ignoreDiscriminator = false) {
         'goal_under_funded': value['goal_under_funded'],
         'goal_overall_funded': value['goal_overall_funded'],
         'goal_overall_left': value['goal_overall_left'],
+        'goal_snoozed_at': value['goal_snoozed_at'],
         'deleted': value['deleted'],
     };
 }
@@ -78517,7 +78519,8 @@ exports.TransactionFlagColor = {
     Yellow: 'yellow',
     Green: 'green',
     Blue: 'blue',
-    Purple: 'purple'
+    Purple: 'purple',
+    Empty: ''
 };
 function instanceOfTransactionFlagColor(value) {
     for (const key in exports.TransactionFlagColor) {
@@ -78627,6 +78630,8 @@ const TransactionDetail_1 = __nccwpck_require__(5029);
 function instanceOfTransactionResponseData(value) {
     if (!('transaction' in value) || value['transaction'] === undefined)
         return false;
+    if (!('server_knowledge' in value) || value['server_knowledge'] === undefined)
+        return false;
     return true;
 }
 exports.instanceOfTransactionResponseData = instanceOfTransactionResponseData;
@@ -78640,6 +78645,7 @@ function TransactionResponseDataFromJSONTyped(json, ignoreDiscriminator) {
     }
     return {
         'transaction': (0, TransactionDetail_1.TransactionDetailFromJSON)(json['transaction']),
+        'server_knowledge': json['server_knowledge'],
     };
 }
 exports.TransactionResponseDataFromJSONTyped = TransactionResponseDataFromJSONTyped;
@@ -78653,6 +78659,7 @@ function TransactionResponseDataToJSONTyped(value, ignoreDiscriminator = false) 
     }
     return {
         'transaction': (0, TransactionDetail_1.TransactionDetailToJSON)(value['transaction']),
+        'server_knowledge': value['server_knowledge'],
     };
 }
 exports.TransactionResponseDataToJSONTyped = TransactionResponseDataToJSONTyped;
