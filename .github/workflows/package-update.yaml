@@ -12,7 +12,7 @@ jobs:
     if: github.actor == 'dependabot[bot]' && github.event.action == 'opened'
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - run: gh pr checkout ${{ github.event.pull_request.number }}
         name: Checkout PR
         env:
