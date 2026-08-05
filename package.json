@@ -29,7 +29,7 @@
     "@types/expect": "^24.3.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "24.x",
-    "@vercel/ncc": "^0.38.3",
+    "@vercel/ncc": "^0.44.1",
     "ts-mocha": "^11.1.0",
     "typescript": "^5.9.3"
   }
