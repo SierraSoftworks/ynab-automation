@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto"
-import {buildUrl, fetchSafe, retry} from "../utils/http"
+import {buildUrl, retry, throwForResponseStatus} from "../utils/http"
 import {CurrencyDataSource, DataSource, StockDataSource} from "./datasource"
 
 const validUserAgents = [
@@ -65,7 +65,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
                 this.cookie = this.crumb = null
             }
 
-            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+            if (!response.ok) throwForResponseStatus(response, await response.text())
 
             const result = await response.json()
             return result.quoteSummary.result[0].price
@@ -88,7 +88,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
                 this.cookie = this.crumb = null
             }
 
-            if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+            if (!response.ok) throwForResponseStatus(response, await response.text())
 
             const result = await response.json()
             return result.quoteSummary.result[0].price
@@ -114,7 +114,9 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
             redirect: "follow"
         })
 
-        const cookie = resp.headers.get("set-cookie").split(";")[0] || ""
+        if (!resp.ok) throwForResponseStatus(resp, await resp.text())
+
+        const cookie = (resp.headers.get("set-cookie") || "").split(";")[0]
         if (!cookie) throw new Error(`${resp.status} ${resp.statusText}: No cookie returned when attempting to initialize a session.`)
 
         return cookie
@@ -129,7 +131,7 @@ export class Yahoo extends DataSource implements StockDataSource, CurrencyDataSo
             redirect: "follow"
         })
 
-        if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+        if (!response.ok) throwForResponseStatus(response, await response.text())
 
         const crumb = response.text()
         if ((await crumb).includes("<html>")) throw new Error(`${response.status} ${response.statusText}: Did not receive a valid crumb when attempting to initialize a session: ${crumb}`)
