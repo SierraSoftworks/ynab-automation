@@ -2,6 +2,19 @@ export function buildUrl(template: string, params: { [key: string]: string }): s
     return template.replace(/\{(\w+)\}/g, (_, key) => encodeURIComponent(params[key] || ''))
 }
 
+export class RateLimitError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = "RateLimitError"
+    }
+}
+
+export function throwForResponseStatus(response: { status: number, statusText: string }, body: string): never {
+    if (response.status === 429) throw new RateLimitError(`${response.status} ${response.statusText}: ${body}`)
+
+    throw new Error(`${response.status} ${response.statusText}: ${body}`)
+}
+
 export async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -13,6 +26,9 @@ export async function retry<T>(action: () => Promise<T>, attempts: number = 2, d
         try {
             return await action()
         } catch (e) {
+            // Retrying a rate limited request will only make matters worse, so give up immediately.
+            if (e instanceof RateLimitError) throw e
+
             if (!attempts) {
                 console.error(e)
                 throw e
@@ -28,7 +44,7 @@ export async function fetchSafe<T>(url: string, options: RequestInit = {}, attem
         const response = await fetch(url, options)
 
         if (!response.ok) {
-            throw new Error(`${response.status} ${response.statusText}: ${await response.text()}`)
+            throwForResponseStatus(response, await response.text())
         }
 
         return await response.json()
